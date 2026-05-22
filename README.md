@@ -115,7 +115,8 @@ FeedbackAnalyzer_10/
 ├── report/                    # Red/Green 산출물 (green_step0~6, 01.red 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
-│   ├── app.py                 # Flask, render_page (God Function)
+│   ├── app.py                 # Flask 라우팅·CSV·비즈니스 흐름
+│   ├── html_renderer.py       # HtmlRenderer — 대시보드 HTML (3-C-2)
 │   ├── feedback.py            # Feedback 모델
 │   ├── text_analyzer.py       # classify_sentiment(), matches_category(), sent(), kw()
 │   ├── filters.py             # filter_feedbacks() — constants·analyzer 규칙 공유
@@ -280,7 +281,7 @@ python scripts/generate_golden_master.py --check
 - [ ] 네이밍: `sent`→`analyze_sentiment`, `kw`→`analyze_keywords` (S-T01)
 - [x] `fil_data` 제거 (B-03) / [x] `global_sent`, `global_kw` (S-T02, 3-C-1)
 - [ ] `_contains_any()` 공통 유틸 1곳 (S-T03)
-- [ ] `render_page()` 분리 → 템플릿/`HtmlRenderer` (S-A01, S-A02)
+- [x] `render_page()` 분리 → `html_renderer.HtmlRenderer` (S-A01, S-A02, 3-C-2)
 - [ ] `file_handler.py` 삭제 또는 `download` 연동 (S-FH01)
 - [ ] 리팩토링 1건 추가 (전략 패턴·Extract Class 등)
 - [x] README 주요 기능 문구 완화 (건수 통계·규칙 기반 명시) / [ ] 차트 등 시각화 추가는 선택

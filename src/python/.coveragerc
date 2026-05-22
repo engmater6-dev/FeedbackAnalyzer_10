@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = text_analyzer, filters, constants, feedback, session, app, logger
+source = text_analyzer, filters, constants, feedback, session, app, logger, html_renderer
 omit =
     file_handler.py
     */tests/*

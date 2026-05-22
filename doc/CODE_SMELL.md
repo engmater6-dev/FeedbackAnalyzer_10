@@ -38,8 +38,9 @@
 | S-F04 | — | `filters` print 제거 | ✅ |
 | S-L02 | B-06 | Logger 페이지 warning/error | ✅ (토글 DEF-008) |
 | S-T02 | — | `global_sent`/`global_kw` 클래스 변수 제거 (3-C-1) | ✅ |
+| S-A01, S-A02 | — | `HtmlRenderer` / `html_renderer.py` (3-C-2) | ✅ |
 
-**Phase 3-C 잔여:** S-A01, S-A02, S-T01, S-T02, S-T03, S-FH01, S-S01~S-S02 등
+**Phase 3-C 잔여:** S-T01, S-T03, S-FH01, S-S01~S-S02, DEF-008 등
 
 ---
 
@@ -49,8 +50,8 @@
 
 | ID | 스멜 | 심각도 | 위치·설명 |
 |----|------|--------|-----------|
-| S-A01 | God Function | High | `render_page()` ~135줄 — CSS·HTML·폼·결과 일체 |
-| S-A02 | God Module | High | 라우팅·비즈니스·프레젠테이션·CSV 혼재 |
+| S-A01 | God Function | High | ~~`render_page()` in app~~ → **✅ 3-C-2** `html_renderer.HtmlRenderer` |
+| S-A02 | God Module | High | ~~프레젠테이션 혼재~~ → **✅ 3-C-2** app=라우팅·I/O, html_renderer=UI |
 | S-A03 | 전역 `fil_data` | High | ~~B-03~~ → **✅ Green** Session.download |
 | S-A04 | 불필요한 `global fil_data` | Low | ~~제거됨~~ **✅ Green** |
 | S-A05 | Primitive Obsession | Med | `list`, `dict`만 전달, 도메인 모델 빈약 |
@@ -121,7 +122,7 @@
 
 | 안티패턴 | 코드 |
 |----------|------|
-| God Function | `app.render_page` |
+| God Function | ~~`app.render_page`~~ → `html_renderer.HtmlRenderer` ✅ |
 | Spaghetti Code | Session + ~~fil_data~~ + ~~global_sent/kw~~ (✅) |
 | Shotgun Surgery | ~~S_KEYWORDS~~ + constants (감정 ✅, 카테고리 main SSOT) |
 | Feature Envy | filters → CATEGORY_KEYWORDS 구조 |
@@ -158,7 +159,7 @@
 1. ~~`classify_sentiment()` 단일화~~ — **✅ Green**  
 2. ~~`matches_category()` main 통일~~ — **✅ Green** ([ADR-001](ADR-001-category-main-only.md))  
 3. ~~`fil_data` 제거~~ — **✅ Green**  
-4. `render_page` → 템플릿/HtmlRenderer — **⏳ Phase 3-C**  
+4. ~~`render_page` → HtmlRenderer~~ — **✅ 3-C-2**  
 5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
 6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · `file_handler`, 네이밍 — **⏳ Phase 3-C**  
 
