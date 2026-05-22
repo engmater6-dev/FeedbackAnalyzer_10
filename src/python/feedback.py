@@ -1,10 +1,5 @@
 # -*- coding: utf-8 -*-
+"""Compatibility shim — use models.feedback in new code."""
+from models.feedback import Feedback  # noqa: F401
 
-
-class Feedback:
-    def __init__(self, text: str):
-        self._text = text
-
-    @property
-    def text(self) -> str:
-        return self._text
+__all__ = ["Feedback"]
