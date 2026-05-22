@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 from feedback import Feedback
-from text_analyzer import classify_sentiment, matches_category
+from analysis_strategies import classify_sentiment, matches_category
 
 
 def filter_feedbacks(
@@ -9,7 +9,7 @@ def filter_feedbacks(
     sentiment_filter: str,
     keyword_filter: str,
 ) -> List[Feedback]:
-    # Sentiment filtering (B-01: same rules as TextAnalyzer.sent)
+    # Sentiment filtering (B-01: same rules as analyze_sentiments)
     if sentiment_filter != "전체":
         tmp_filtered = []
         for item in data_list:
@@ -18,7 +18,7 @@ def filter_feedbacks(
     else:
         tmp_filtered = list(data_list)
 
-    # Keyword (category) filtering (B-02: same main-only rule as TextAnalyzer.kw)
+    # Keyword (category) filtering (B-02: same main-only rule as analyze_keywords)
     if keyword_filter != "전체":
         final_filtered = [
             item
