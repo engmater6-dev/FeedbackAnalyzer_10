@@ -43,7 +43,7 @@
 | S-T01, S-T03 | — | 네이밍·contains_any (3-C-5~6) | ✅ |
 | — | — | `analysis_strategies` (3-C-7) | ✅ |
 
-**Phase 3-C:** ✅ 완료 · **Phase 4:** ✅ R-07/R-08 · Phase 5~6·문서 DEF-020~022 잔여
+**Phase 3-C:** ✅ 완료 · **Phase 4:** ✅ R-07/R-08 · **Phase 5:** Trend·DB ✅ · Phase 6·DEF-020~022 잔여
 
 ---
 
@@ -86,8 +86,8 @@
 
 | ID | 스멜 | 심각도 |
 |----|------|--------|
-| S-C01 | 하드코딩 | Med |
-| S-C02 | 불완전한 SSOT | High — filters가 감정은 별도 사전 사용 |
+| S-C01 | 하드코딩 | Med | **✅ Phase 5** SQLite 시드·DB |
+| S-C02 | 불완전한 SSOT | High | **✅ Phase 5** `classify_sentiment` → keyword_db |
 | S-C03 | 과도한 중첩 dict | Low |
 
 ### 2.5 `models/session.py` (구 `session.py`)

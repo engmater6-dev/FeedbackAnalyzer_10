@@ -334,8 +334,8 @@ python scripts/generate_golden_master.py --check
 
 - [x] `sample/test_feedback_trend.csv` 추가 (`date,text` · 15건 · [CSV_FORMAT.md](doc/CSV_FORMAT.md) §8)
 - [x] Trend 시각화 — `date,text` 업로드 시 월별 감정·키워드 막대 ([report/05.phase5_trend.md](report/05.phase5_trend.md))
-- [ ] 감정 키워드 File DB (SQLite) — `constants` 대체 (S-C01, S-C02)
-- [ ] DB ↔ analyzer ↔ filter 연동
+- [x] 감정 키워드 File DB (SQLite) — `constants` 시드, 런타임 DB SSOT ([doc/KEYWORD_DB.md](doc/KEYWORD_DB.md))
+- [x] DB ↔ analyzer ↔ filter 연동 — `classify_sentiment` 단일 경로 ([report/05.phase5_keyword_db.md](report/05.phase5_keyword_db.md))
 
 ### Phase 6 — 리뷰·발표 (약 2시간)
 

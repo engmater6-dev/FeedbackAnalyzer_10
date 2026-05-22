@@ -25,6 +25,7 @@ class HtmlRenderer:
         keyword_results: Optional[Dict[str, int]] = None,
         trend_sentiment: Optional[Dict[str, Dict[str, int]]] = None,
         trend_keyword: Optional[Dict[str, Dict[str, int]]] = None,
+        keyword_entries: Optional[List] = None,
         feedbacks: Optional[List] = None,
     ) -> str:
         if sentiment_results is None:
@@ -35,6 +36,10 @@ class HtmlRenderer:
             trend_sentiment = {}
         if trend_keyword is None:
             trend_keyword = {}
+        if keyword_entries is None:
+            from services.keyword_db import list_all
+
+            keyword_entries = list_all()
         if feedbacks is None:
             feedbacks = []
 
@@ -50,6 +55,7 @@ class HtmlRenderer:
         html += self._upload_section()
         html += self._filter_section()
         html += self._log_settings_section()
+        html += self._keyword_settings_section(keyword_entries)
 
         if warning:
             html += f'<p class="alert alert-warning">{escape(warning)}</p>'
@@ -104,6 +110,11 @@ class HtmlRenderer:
         .trend-bar-fill.category { background-color: #007bff; }
         .trend-bar-count { width: 32px; text-align: right; color: #333; }
         .upload-hint { font-size: 13px; color: #666; margin-top: 8px; }
+        .kw-table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+        .kw-table th, .kw-table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        .kw-table th { background: #f8f9fa; }
+        .kw-delete-btn { background-color: #dc3545; padding: 4px 10px; font-size: 12px; }
+        .kw-delete-btn:hover { background-color: #c82333; }
     </style>
 </head>
 <body>
@@ -283,6 +294,52 @@ class HtmlRenderer:
     </div>"""
 
     @staticmethod
+    def _keyword_settings_section(entries: List) -> str:
+        rows_html = ""
+        for entry in entries:
+            rows_html += (
+                f"<tr>"
+                f"<td>{escape(str(entry['id']))}</td>"
+                f"<td>{escape(str(entry['label']))}</td>"
+                f"<td>{escape(str(entry['word']))}</td>"
+                f"<td>"
+                f'<form action="/settings/keywords" method="post" style="margin:0;">'
+                f'<input type="hidden" name="action" value="delete">'
+                f'<input type="hidden" name="word_id" value="{escape(str(entry["id"]))}">'
+                f'<button type="submit" class="kw-delete-btn">삭제</button>'
+                f"</form></td></tr>"
+            )
+        if not rows_html:
+            rows_html = (
+                '<tr><td colspan="4" style="text-align:center;color:#666;">'
+                "등록된 키워드가 없습니다.</td></tr>"
+            )
+        return f"""
+    <div class="section">
+        <h3>감정 키워드 관리 (SQLite)</h3>
+        <p class="upload-hint">긍정·부정 키워드는 DB에 저장되며 분석·필터에 즉시 반영됩니다.</p>
+        <table class="kw-table">
+            <thead><tr><th>ID</th><th>감정</th><th>키워드</th><th></th></tr></thead>
+            <tbody>{rows_html}</tbody>
+        </table>
+        <form action="/settings/keywords" method="post">
+            <input type="hidden" name="action" value="add">
+            <div class="form-group">
+                <label for="kw_label">감정:</label>
+                <select id="kw_label" name="label">
+                    <option value="긍정">긍정</option>
+                    <option value="부정">부정</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="kw_word">키워드:</label>
+                <input type="text" id="kw_word" name="word" placeholder="예: 최고예요">
+            </div>
+            <button type="submit">키워드 추가</button>
+        </form>
+    </div>"""
+
+    @staticmethod
     def _page_logs_section() -> str:
         css_by_level = {
             "warning": "alert-warning",
@@ -311,6 +368,7 @@ def render_page(
     keyword_results: dict = None,
     trend_sentiment: dict = None,
     trend_keyword: dict = None,
+    keyword_entries: list = None,
     feedbacks: list = None,
 ) -> str:
     """Backward-compatible facade for Flask routes."""
@@ -322,5 +380,6 @@ def render_page(
         keyword_results=keyword_results,
         trend_sentiment=trend_sentiment,
         trend_keyword=trend_keyword,
+        keyword_entries=keyword_entries,
         feedbacks=feedbacks,
     )

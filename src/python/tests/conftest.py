@@ -20,13 +20,27 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def reset_session():
+def reset_session(tmp_path):
     reset_app_session()
     Logger._ui_logs = []
     Logger.show_warning_on_page = True
     Logger.show_error_on_page = True
     Logger.show_info_on_page = False
+
+    from services import keyword_db
+    from services.sentiment import invalidate_sentiment_cache
+
+    db_file = tmp_path / "sentiment_keywords.db"
+    keyword_db.set_db_path(str(db_file))
+    keyword_db.reset_db_connection()
+    keyword_db.ensure_db_ready()
+    invalidate_sentiment_cache()
+
     yield
+
+    keyword_db.reset_db_connection()
+    keyword_db.set_db_path(None)
+    invalidate_sentiment_cache()
     reset_app_session()
     Logger._ui_logs = []
     Logger.show_warning_on_page = True

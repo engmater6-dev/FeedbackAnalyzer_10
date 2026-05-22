@@ -258,7 +258,7 @@ python scripts/generate_golden_master.py --check
 | 5-1 | [ ] | Mom Test 인터뷰 3명(선택) → Trend Go/No-Go | §8-5 | No-Go면 5-2~5-4 skip 가능 |
 | 5-2 | [x] | `sample/test_feedback_trend.csv` 추가 | — | |
 | 5-3 | [x] | Trend 시각화 UI | — | `trend_service`, HtmlRenderer |
-| 5-4 | [ ] | SQLite 감정 키워드 DB | — | constants 대체 |
+| 5-4 | [x] | SQLite 감정 키워드 DB | — | keyword_db, CRUD UI |
 | 5-5 | [ ] | **DEF-016:** sub 키워드 매칭 확장 시 analyzer·filter·**Golden Master `--force`** | 016 | 정책이 main-only 유지면 5-5 = 문서만 완료 |
 
 **Phase 5 Gate:** 5-1 결정서 + (Go 시) 5-2~5-4 또는 (No-Go 시) DEF-016 문서 **완료** 처리

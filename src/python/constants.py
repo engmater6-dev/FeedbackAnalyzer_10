@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# SENTIMENT_KEYWORDS: seed for SQLite (R-10). Runtime SSOT is services.keyword_db.
 
 SENTIMENT_KEYWORDS = {
     "긍정": [
