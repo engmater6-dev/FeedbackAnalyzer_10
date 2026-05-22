@@ -3,6 +3,7 @@ import csv
 import io
 
 from models.feedback import Feedback
+from services.trend_csv_parser import is_trend_csv, parse_trend_csv_to_feedbacks
 
 
 def parse_csv_to_feedbacks(content: str) -> list:
@@ -27,3 +28,10 @@ def parse_csv_to_feedbacks(content: str) -> list:
             if text:
                 feedbacks.append(Feedback(text))
     return feedbacks
+
+
+def parse_csv_content(content: str) -> list:
+    """B-04 standard CSV, or date,text trend CSV when header has both columns."""
+    if is_trend_csv(content):
+        return parse_trend_csv_to_feedbacks(content)
+    return parse_csv_to_feedbacks(content)

@@ -6,7 +6,8 @@ from handlers._deps import text_analyzer
 from html_renderer import render_page
 from logger import Logger
 from models.session import get_session
-from services.csv_parser import parse_csv_to_feedbacks
+from services.csv_parser import parse_csv_content
+from services.trend_service import build_trend_results
 
 bp = Blueprint("upload", __name__)
 
@@ -21,7 +22,7 @@ def upload():
         added = 0
         if file and file.filename:
             content = file.read().decode("utf-8-sig")
-            parsed = parse_csv_to_feedbacks(content)
+            parsed = parse_csv_content(content)
             added = len(parsed)
             feedbacks.extend(parsed)
             session.update_current_feedbacks(feedbacks)
@@ -32,9 +33,12 @@ def upload():
 
         sentiment_results = {}
         keyword_results = {}
+        trend_sentiment = {}
+        trend_keyword = {}
         if feedbacks:
             sentiment_results = text_analyzer.analyze_sentiments(feedbacks)
             keyword_results = text_analyzer.analyze_keywords(feedbacks)
+            trend_sentiment, trend_keyword = build_trend_results(feedbacks)
 
         if added:
             success = (
@@ -48,6 +52,8 @@ def upload():
             success=success,
             sentiment_results=sentiment_results,
             keyword_results=keyword_results,
+            trend_sentiment=trend_sentiment,
+            trend_keyword=trend_keyword,
             feedbacks=feedbacks,
         )
     except Exception as e:

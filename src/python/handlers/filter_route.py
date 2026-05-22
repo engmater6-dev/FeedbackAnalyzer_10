@@ -7,6 +7,7 @@ from html_renderer import render_page
 from logger import Logger
 from models.session import get_session
 from services.filter_service import filter_feedbacks
+from services.trend_service import build_trend_results
 
 bp = Blueprint("filter", __name__)
 
@@ -26,10 +27,13 @@ def filter_route():
                 session.set_download_feedbacks(filtered)
                 sentiment_results = text_analyzer.analyze_sentiments(filtered)
                 keyword_results = text_analyzer.analyze_keywords(filtered)
+                trend_sentiment, trend_keyword = build_trend_results(filtered)
                 Logger.log_info(f"필터링 결과: {len(filtered)}개의 피드백")
                 return render_page(
                     sentiment_results=sentiment_results,
                     keyword_results=keyword_results,
+                    trend_sentiment=trend_sentiment,
+                    trend_keyword=trend_keyword,
                     feedbacks=filtered,
                 )
             else:

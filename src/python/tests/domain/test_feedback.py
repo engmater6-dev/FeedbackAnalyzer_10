@@ -24,6 +24,10 @@ class TestFeedback:
         assert fb.sentiment == "긍정"
         assert fb.category == "품질"
 
+    def test_recorded_at_optional(self):
+        fb = Feedback("x", recorded_at="2026-03-01")
+        assert fb.recorded_at == "2026-03-01"
+
     def test_annotation_after_analyze(self):
         fb = Feedback("배송이 너무 늦어요. 화가 납니다.")
         TextAnalyzer().analyze_sentiments([fb])

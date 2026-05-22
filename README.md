@@ -333,7 +333,7 @@ python scripts/generate_golden_master.py --check
 ### Phase 5 — 확장 (약 3시간)
 
 - [x] `sample/test_feedback_trend.csv` 추가 (`date,text` · 15건 · [CSV_FORMAT.md](doc/CSV_FORMAT.md) §8)
-- [ ] Trend 시각화 (Mom Test 인터뷰 후 Go/No-Go)
+- [x] Trend 시각화 — `date,text` 업로드 시 월별 감정·키워드 막대 ([report/05.phase5_trend.md](report/05.phase5_trend.md))
 - [ ] 감정 키워드 File DB (SQLite) — `constants` 대체 (S-C01, S-C02)
 - [ ] DB ↔ analyzer ↔ filter 연동
 

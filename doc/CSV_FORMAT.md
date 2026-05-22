@@ -114,8 +114,10 @@ date,text
 
 | 단계 | 파서 동작 |
 |------|-----------|
-| Phase 5-1 (현재) | B-04 `parse_csv_to_feedbacks` — **`text` 열만** 적재, `date` 무시 |
-| Phase 5-2+ (#11) | `date` 기반 기간별 sent/kw 집계·시각화 |
+| `text`만 헤더 | B-04 `parse_csv_to_feedbacks` |
+| `date`+`text` 헤더 | `parse_trend_csv_to_feedbacks` → `Feedback.recorded_at` |
+| 업로드 진입점 | `parse_csv_content()` — 헤더 자동 판별 |
+| UI | `services/trend_service` 월별 집계 → 대시보드 **월별 추이** 섹션 |
 
 ---
 

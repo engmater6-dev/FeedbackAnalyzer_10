@@ -152,7 +152,7 @@ class TestRoutesErrors:
         def _fail(_content):
             raise ValueError("parse")
 
-        monkeypatch.setattr("handlers.upload.parse_csv_to_feedbacks", _fail)
+        monkeypatch.setattr("handlers.upload.parse_csv_content", _fail)
         response = client.post(
             "/upload",
             data={"file": (io.BytesIO(b"text\nx"), "a.csv")},
