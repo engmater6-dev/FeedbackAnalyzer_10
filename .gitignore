@@ -1,0 +1,6 @@
+src/python/data/*.db
+src/python/.coverage
+src/python/__pycache__/
+src/python/**/__pycache__/
+src/python/.venv/
+*.pyc

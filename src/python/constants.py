@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# SENTIMENT_KEYWORDS: seed for SQLite (R-10). Runtime SSOT is services.keyword_db.
 
 SENTIMENT_KEYWORDS = {
     "긍정": [
@@ -9,7 +10,7 @@ SENTIMENT_KEYWORDS = {
     "부정": [
         "나쁘", "불만", "실망", "최악", "별로", "불편", "불만족", "문제",
         "불량", "불량품", "환불", "교환", "불만족스럽", "실망스럽",
-        "짜증", "화남", "별로에요", "엉망", "최악이다", "실패", "구려",
+        "짜증", "화남", "화가", "별로에요", "엉망", "최악이다", "실패", "구려",
     ],
 }
 

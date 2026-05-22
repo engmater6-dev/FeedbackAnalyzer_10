@@ -1,0 +1,87 @@
+# Feedback Analyzer — Cursor Rules
+
+## Project context
+
+This is an **educational refactoring challenge**, not a production app. The codebase intentionally contains code smells and anti-patterns for learners to identify and fix using TDD, Clean Code, and refactoring techniques.
+
+- **Stack**: Python 3.9+, Flask 3.1, flat modules under `src/python/`
+- **Entry**: `src/python/app.py` → `http://localhost:8080`
+- **Docs**: `doc/PRD.md` (requirements), `project_purpose.md` (8-step mission), `README.md` (setup + To Do List)
+
+## Architecture (current)
+
+| Module | Role |
+|--------|------|
+| `app.py` | Flask routes, `render_page()` (God Function), global `fil_data` |
+| `text_analyzer.py` | `sent()`, `kw()` — sentiment/category counts |
+| `filters.py` | `filter_feedbacks()` — duplicate `S_KEYWORDS`, `_contains_any` |
+| `constants.py` | `SENTIMENT_KEYWORDS`, `CATEGORY_KEYWORDS` |
+| `session.py` | `Session.current_feedbacks` (class variable) |
+| `feedback.py` | `Feedback` model (text only) |
+| `logger.py` | print/stderr logging (not shown in UI) |
+| `file_handler.py` | Dead code (Lava Flow) — unused |
+
+## Known bugs to fix (do not reintroduce)
+
+1. **Neutral filter mismatch**: `text_analyzer` uses `constants.SENTIMENT_KEYWORDS` (no neutral keywords; else → neutral). `filters.py` uses separate `S_KEYWORDS` with neutral list — filter and analyze disagree.
+2. **Category filter mismatch**: `kw()` matches `main` only; `filter_feedbacks` skips `sub_key == "main"` — category filter misses main keywords like "배송".
+3. **Download**: `GET /download` uses global `fil_data`, only set after successful `POST /filter`.
+4. **CSV upload**: Skips first row, uses column 0 only — does not honor `text` column per README.
+
+## Development principles
+
+1. **TDD first**: Write failing tests (Red), implement minimum (Green), then refactor. Target **90%+ coverage** before large refactors.
+2. **Minimal scope**: Fix one mission item per change; avoid unrelated edits.
+3. **Single source of truth**: Unify sentiment/category keywords in one place (prefer `constants.py` or File DB after Phase 5).
+4. **Separate concerns**: Move HTML out of `app.py`; business logic out of route handlers.
+5. **No new globals**: Replace `fil_data`, `TextAnalyzer.global_sent`, `global_kw` with session/service objects.
+6. **Match existing style**: UTF-8, Korean UI strings, Flask inline patterns until templates are introduced.
+
+## Naming conventions (target state)
+
+| Avoid | Prefer |
+|-------|--------|
+| `sent`, `kw`, `fil` | `analyze_sentiment`, `analyze_keywords`, `filtered_feedbacks` |
+| `fil_data` | session-held filtered list or explicit download DTO |
+| `S_KEYWORDS` in filters | import from shared constants or DB |
+
+## Refactoring targets (from PRD)
+
+- Extract `HtmlRenderer`, route handlers, `CsvParser`
+- Consolidate `_contains_any` into one utility
+- Remove or wire `FileHandler`
+- Optional dirs: `handlers/`, `services/`, `models/`, `tests/`
+
+## Mission phases (README To Do List)
+
+0. Setup → 1. Tests (90%) → 2. Bug fixes & UX → 3. Naming/globals/dedup → 4. Structure → 5. Trend + File DB → 6. Team review in `report/`
+
+## When implementing features
+
+- **Logging UI**: Surface `Logger` messages on page by level (warning, error); configurable visibility.
+- **Trend**: Use `sample/test_feedback_trend.csv` (learner adds file); chart on dashboard.
+- **File DB**: SQLite (or similar) for sentiment keyword CRUD; wire into analyzer and filters.
+- **CSV**: Parse `text` column by header name; validate on upload.
+
+## Files and folders
+
+| Path | Purpose |
+|------|---------|
+| `doc/PRD.md` | Product requirements, bugs, phases |
+| `sample/` | Sample CSV including trend data |
+| `report/` | Review and presentation artifacts |
+| `prompt/` | Optional AI prompts |
+| `.venv/` | Local venv — do not commit |
+
+## Git / commits
+
+- Do not commit `.venv/`, secrets, or local paths.
+- Commit only when the user explicitly asks.
+- Prefer focused commit messages describing *why*.
+
+## AI assistant behavior
+
+- Read `doc/PRD.md` and `README.md` To Do List before large changes.
+- Prefer tests before production code changes for bug fixes (B-01, B-02).
+- Do not remove intentional smells until the mission step calls for it.
+- Explain trade-offs when suggesting architecture (templates vs inline HTML).

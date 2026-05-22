@@ -1,0 +1,26 @@
+[run]
+branch = True
+source =
+    app,
+    handlers,
+    services,
+    models,
+    constants,
+    feedback,
+    filters,
+    text_analyzer,
+    logger,
+    html_renderer,
+    text_utils,
+    analysis_strategies
+omit =
+    */tests/*
+    handlers/_deps.py
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+
+[html]
+directory = ../../report/coverage_html
