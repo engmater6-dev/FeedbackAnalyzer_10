@@ -137,7 +137,9 @@ class TestRoutesErrors:
         def _raise():
             raise RuntimeError("test failure")
 
-        monkeypatch.setattr("app.Session.get_current_feedbacks", _raise)
+        monkeypatch.setattr(
+            "handlers.analyze.Session.get_current_feedbacks", _raise
+        )
         response = client.post("/analyze", data={"text": "x"})
         html = response.get_data(as_text=True)
 
@@ -148,7 +150,7 @@ class TestRoutesErrors:
         def _fail(_content):
             raise ValueError("parse")
 
-        monkeypatch.setattr("app._parse_csv_to_feedbacks", _fail)
+        monkeypatch.setattr("handlers.upload.parse_csv_to_feedbacks", _fail)
         response = client.post(
             "/upload",
             data={"file": (io.BytesIO(b"text\nx"), "a.csv")},
@@ -163,7 +165,7 @@ class TestRoutesErrors:
         def _fail(*_args, **_kwargs):
             raise RuntimeError("filter failed")
 
-        monkeypatch.setattr("app.filter_feedbacks", _fail)
+        monkeypatch.setattr("handlers.filter_route.filter_feedbacks", _fail)
         response = client.post(
             "/filter",
             data={"sentiment": "전체", "keyword": "전체"},

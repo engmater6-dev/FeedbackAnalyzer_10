@@ -1,8 +1,22 @@
 [run]
 branch = True
-source = text_analyzer, filters, constants, feedback, session, app, logger, html_renderer, text_utils, analysis_strategies
+source =
+    app,
+    handlers,
+    services,
+    models,
+    constants,
+    feedback,
+    session,
+    filters,
+    text_analyzer,
+    logger,
+    html_renderer,
+    text_utils,
+    analysis_strategies
 omit =
     */tests/*
+    handlers/_deps.py
 
 [report]
 precision = 2
