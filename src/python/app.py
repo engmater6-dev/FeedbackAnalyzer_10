@@ -15,8 +15,31 @@ from logger import Logger
 
 app = Flask(__name__)
 
-fil_data: list = []
 text_analyzer = TextAnalyzer()
+
+
+def _parse_csv_to_feedbacks(content: str) -> list:
+    """B-04: use `text` column when header present, else column 0."""
+    reader = csv.reader(io.StringIO(content))
+    rows = [row for row in reader if row]
+    if not rows:
+        return []
+
+    header = [cell.strip().lower() for cell in rows[0]]
+    if "text" in header:
+        text_col = header.index("text")
+        data_rows = rows[1:]
+    else:
+        text_col = 0
+        data_rows = rows
+
+    feedbacks = []
+    for row in data_rows:
+        if len(row) > text_col:
+            text = row[text_col].strip()
+            if text:
+                feedbacks.append(Feedback(text))
+    return feedbacks
 
 
 def _current_timestamp() -> str:
@@ -156,6 +179,14 @@ def render_page(
     if error:
         html += f'<p class="alert alert-danger">{escape(error)}</p>'
 
+    for entry in Logger.get_page_logs():
+        level = entry["level"]
+        css = "alert-warning" if level == "warning" else "alert-danger"
+        html += (
+            f'<p class="alert {css}">{escape(entry["timestamp"])} '
+            f'[{level.upper()}] {escape(entry["message"])}</p>'
+        )
+
     html += "</div></body></html>"
     return html
 
@@ -169,7 +200,6 @@ def index():
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
-    global fil_data
     try:
         feedbacks = Session.get_current_feedbacks()
         text = request.form.get("text", "")
@@ -178,6 +208,9 @@ def analyze():
             line = line.strip()
             if line:
                 feedbacks.append(Feedback(line))
+
+        Session.update_current_feedbacks(feedbacks)
+        Session.set_download_feedbacks(feedbacks)
 
         for fb in feedbacks:
             Logger.log_info(fb.text)
@@ -210,20 +243,38 @@ def upload():
     try:
         feedbacks = Session.get_current_feedbacks()
         file = request.files.get("file")
+        added = 0
         if file and file.filename:
             content = file.read().decode("utf-8-sig")
-            reader = csv.reader(io.StringIO(content))
-            first_line = True
-            for row in reader:
-                if first_line:
-                    first_line = False
-                    continue
-                if row and row[0].strip():
-                    feedbacks.append(Feedback(row[0].strip()))
+            parsed = _parse_csv_to_feedbacks(content)
+            added = len(parsed)
+            feedbacks.extend(parsed)
+            Session.update_current_feedbacks(feedbacks)
+            Session.set_download_feedbacks(feedbacks)
             Logger.log_info("파일이 성공적으로 업로드되었습니다.")
+            if added == 0:
+                Logger.log_warning("CSV에서 읽을 수 있는 피드백이 없습니다.")
 
-        success = f"{len(feedbacks)}개의 피드백이 입력되었습니다."
-        return render_page(success=success, feedbacks=feedbacks)
+        sentiment_results = {}
+        keyword_results = {}
+        if feedbacks:
+            sentiment_results = text_analyzer.sent(feedbacks)
+            keyword_results = text_analyzer.kw(feedbacks)
+
+        if added:
+            success = (
+                f"CSV {added}건 업로드 완료. 총 {len(feedbacks)}개 피드백 — "
+                "아래 분석 결과를 확인하세요."
+            )
+        else:
+            success = f"{len(feedbacks)}개의 피드백이 입력되었습니다."
+
+        return render_page(
+            success=success,
+            sentiment_results=sentiment_results,
+            keyword_results=keyword_results,
+            feedbacks=feedbacks,
+        )
     except Exception as e:
         Logger.log_error(f"파일 업로드 오류: {e}")
         return render_page(error="파일 업로드 중 오류가 발생했습니다.")
@@ -231,7 +282,6 @@ def upload():
 
 @app.route("/filter", methods=["POST"])
 def filter_route():
-    global fil_data
     try:
         feedbacks = Session.get_current_feedbacks()
         sentiment = request.form.get("sentiment", "전체")
@@ -240,7 +290,7 @@ def filter_route():
         if feedbacks:
             filtered = filter_feedbacks(feedbacks, sentiment, keyword)
             if filtered:
-                fil_data = filtered
+                Session.set_download_feedbacks(filtered)
                 sentiment_results = text_analyzer.sent(filtered)
                 keyword_results = text_analyzer.kw(filtered)
                 Logger.log_info(f"필터링 결과: {len(filtered)}개의 피드백")
@@ -265,7 +315,7 @@ def download():
     output = io.StringIO()
     output.write("\ufeff")  # UTF-8 BOM
     output.write("text\n")
-    for fb in fil_data:
+    for fb in Session.get_download_feedbacks():
         output.write(fb.text + "\n")
 
     return Response(
