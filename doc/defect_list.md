@@ -5,8 +5,8 @@
 | 문서 ID | QA-DEF-01 |
 | 작성 | QA 리드 |
 | 일자 | 2026-05-22 |
-| 대상 브랜치 | `green` |
-| 근거 | Red 재현 · Green 수정 · QA 분석(`doc/`, `README.md`, `src/`) |
+| 대상 브랜치 | **`refactor`** (기준 `green` + Phase 3 Refactor) |
+| 근거 | Red · Green · Refactor · QA 분석(`doc/`, `README.md`, `src/`) |
 | 관련 | [PRD.md](PRD.md) §4, [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
 
 ---
@@ -20,21 +20,21 @@
 | **부분완료** | 3 |
 | **미완료** | 0 |
 
-| Severity | 완료 | 미완료·부분 |
-|----------|------|-------------|
-| Critical / High | 4 | 2 |
-| Medium | 8 | 1 |
-| Low | 3 | 2 |
+| Severity | 완료 | 부분완료 |
+|----------|------|----------|
+| Critical / High | 6 | 0 |
+| Medium | 11 | 2 |
+| Low | 4 | 1 |
 
 | 마일스톤 | 상태 |
 |----------|------|
 | TDD Red (`red`) | ✅ Anchor 4 fail 고정 |
-| TDD Green Step 0~6 | ✅ B-01~B-06, IT, cov 97.4% |
-| Golden Master | ✅ `golden_master_expected.txt` + approve 테스트 |
-| Phase 3 Refactor | ⏳ §6.3 체크리스트 |
-| Phase 6 QA 종결 | ⏳ §6.6 Gate |
+| TDD Green (`green`) | ✅ B-01~B-06, Step 0~7, Golden Master |
+| Phase 3 Refactor (`refactor`) | ✅ 3-A~3-D (3-C-1~7, Gate **50 passed**) |
+| Phase 4~5 (선택) | ⏳ 구조·Trend·DB |
+| Phase 6 QA 종결 | ⏳ §6.6 Gate (DEF-020~022 문서·발표) |
 
-> **최종 갱신 (2026-05-22):** pytest **39 passed** · cov **97.42%** · [README](../README.md)·본 문서 동기화
+> **최종 갱신 (2026-05-22 · `refactor`):** pytest **50 passed** · cov **97.78%** · Golden Master **OK** · 구조·UX DEF **008~019 완료** · 문서 DEF **020~022 부분완료**
 
 ---
 
@@ -75,9 +75,9 @@
 | B-01 | DEF-001, DEF-002, DEF-003 | 완료 |
 | B-02 | DEF-004 | 완료 |
 | B-03 | DEF-005 | 완료 |
-| B-04 | DEF-006, DEF-015(잔여 엣지) | 완료 / DEF-015 미완료 |
+| B-04 | DEF-006, DEF-015 | 완료 |
 | B-05 | DEF-007 | 완료 |
-| B-06 | DEF-008 | 부분완료 |
+| B-06 | DEF-008 | 완료 (3-C-4 UI 토글) |
 
 ---
 
@@ -93,15 +93,17 @@
 
 ---
 
-## 5. 테스트·회귀 현황 (2026-05-22)
+## 5. 테스트·회귀 현황 (2026-05-22 · `refactor`)
 
 | 구분 | 수치 | 명령 |
 |------|------|------|
-| 전체 | **39 passed** | `pytest tests/ -q` |
-| 커버리지 | **97.42%** | `pytest tests/ --cov --cov-fail-under=90` |
-| Domain Gate | 6 | `test_anchor_*`, `test_filters_regression` |
-| Boundary IT | 8+ | `test_routes_analyze_filter` |
-| Golden Master | 1 | `test_golden_master` · baseline `tests/golden_master_expected.txt` |
+| 전체 | **50 passed** | `pytest tests/ -q` |
+| 커버리지 | **97.78%** | `pytest tests/ --cov --cov-fail-under=90` |
+| Domain Gate | 6+ | Anchor·회귀·`test_text_utils`·`test_analysis_strategies` |
+| Boundary IT | 12+ | `test_routes_analyze_filter` (로그 설정 IT 포함) |
+| Golden Master | 1 | `test_golden_master` · `generate_golden_master.py --check` |
+
+**모듈 커버리지:** `analysis_strategies`, `text_utils`, `html_renderer`, `text_analyzer` 등 **100%** 또는 **≥96%**
 
 ---
 
@@ -115,25 +117,25 @@
 ```text
 Phase 0 [ ] 수동 E2E
     ↓
-Phase 1~2 ✅ (Green·B-01~06·Golden Master)
+Phase 1~2 ✅ (`green` · B-01~06 · Golden Master)
     ↓
-Phase 3 [ ] Refactor + DEF-008·015·016(문서)
+Phase 3 ✅ (`refactor` · 3-A~D · 50 passed)
     ↓
 Phase 4 [ ] (선택) 구조·모델
     ↓
-Phase 5 [ ] (선택) Trend·DB — DEF-016 구현 여부 확정
+Phase 5 [ ] (선택) Trend·DB
     ↓
-Phase 6 [ ] 리뷰·문서·발표·QA 종결  ← 최종 Gate
+Phase 6 [ ] 리뷰·문서·발표  ← DEF-020~022 최종
 ```
 
 | Phase | 예상 | DEF·산출물 | Gate 요약 |
 |-------|------|------------|-----------|
-| 0 | 0.5h | 수동 E2E | 브라우저 5시나리오 통과 기록 |
-| 1~2 | ✅ | — | 39 passed, cov ≥90% |
-| 3 | 2.5h | DEF-008,015,017~019,022 | Refactor 후 회귀 0 |
-| 4 | 선택 | R-07, S-FB/S-S | 디렉터리·모델 분리 |
-| 5 | 3h | Trend·DB | DEF-016 결정 반영 |
-| **6** | **2h** | **DEF-020,021, report, 발표** | **문서·리뷰·§8·결함표 종결** |
+| 0 | 0.5h | 수동 E2E | 브라우저 5시나리오 |
+| 1~2 | ✅ | Green | 39→50 tests, cov ≥90% |
+| **3** | **✅** | **008~019, 015~016 문서, 3-C-1~7** | **50 passed, cov 97.78%, GM OK** |
+| 4 | 선택 | R-07 | handlers/services 분리 |
+| 5 | 3h | Trend·DB | ADR-001 재검토 |
+| **6** | **2h** | **020~022, report, 발표** | **실습 종결 Gate** |
 
 ---
 
@@ -182,13 +184,13 @@ python scripts/generate_golden_master.py --check
 | 2-2 | [x] | B-03~B-06 Session·CSV·로그 UI | 005~008,013,014 |
 | 2-3 | [x] | 멀티라인·print 제거 | 009 |
 
-**Phase 2 Gate:** Green Step 0~6 커밋 완료 (현재 `green` 브랜치)
+**Phase 2 Gate:** Green Step 0~7 (`green` 브랜치 · `a244a4a`)
 
 ---
 
-### Phase 3 — 코드 품질·스멜 (약 2.5시간) ⏳
+### Phase 3 — 코드 품질·스멜 (약 2.5시간) ✅ 완료 (`refactor`)
 
-**목표:** 미완료 High/Medium 기술부채 해소 + 부분완료 DEF-008·015·022 마무리
+**목표:** 구조 부채·스멜 제거 — **달성** (3-A~3-D). 문서 DEF-020~022는 Phase 6에서 최종 종결.
 
 #### 3-A. 사전 (Phase 6 문서 초안, 20분)
 
@@ -324,19 +326,17 @@ python scripts/generate_golden_master.py --check
 
 ---
 
-### 6.1 미완료 DEF → Phase 빠른 참조
+### 6.1 잔여·부분완료 DEF → Phase 참조
 
-| ID | 담당 Phase | Phase 6 종결 조건 |
-|----|------------|-------------------|
-| DEF-008 | 3-C-4 ✅ | `/settings/logs` |
-| DEF-015 | 3-B-1 ✅ | [CSV_FORMAT.md](CSV_FORMAT.md) |
-| DEF-016 | 3-B-2 ✅ | [ADR-001](ADR-001-category-main-only.md) — sub 확장 Phase 5 |
-| DEF-017 | 3-C-2 ✅ | `html_renderer.py` |
-| DEF-018 | 3-C-1 ✅ | global 제거 |
-| DEF-019 | 3-C-3 ✅ | `file_handler.py` 삭제 |
-| DEF-020 | 3-A-1~2 ✅, 6-A-2 | Phase 6 §7·§8 최종 |
-| DEF-021 | 3-A-3 ✅, 6-A-3 | Phase 6 최종 스냅샷 |
-| DEF-022 | 6-A-4 | README (차트 선택) |
+| ID | 현재 | Phase 6 종결 조건 |
+|----|------|-------------------|
+| DEF-008~019 | **완료** | — |
+| DEF-015, 016 | **완료** | CSV_FORMAT · ADR-001 |
+| DEF-020 | **부분완료** | MOM_TEST §8 인터뷰 · §7 최종 (6-A-2) |
+| DEF-021 | **부분완료** | test_plan `refactor` Gate 50 tests (6-A-3) |
+| DEF-022 | **부분완료** | README Phase 4~6·차트 정책 (6-A-4) |
+
+**`refactor` 주요 커밋:** `CSV 규칙·main-only 정책 문서` → `global_sent, global_kw 제거` → `render_page 분리` → `file_handler 제거` → `Logger UI 토글` → `contains_any 공통 유틸` → `분석 전략 패턴 적용` → `sent/kw 네이밍 개선`
 
 ---
 
@@ -354,3 +354,4 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Phase 3-C-3 — `file_handler.py` 삭제, DEF-019 완료 |
 | 2026-05-22 | Phase 3-C-4 — Logger UI 토글, DEF-008 완료 |
 | 2026-05-22 | Phase 3-C-5~7 — 네이밍·text_utils·전략패턴, 3-D Gate |
+| 2026-05-22 | §1·§5·§6·README 진행사항 동기화 — 50 passed, Phase 3 ✅ |

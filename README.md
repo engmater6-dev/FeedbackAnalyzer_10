@@ -110,8 +110,10 @@ FeedbackAnalyzer_10/
 │   ├── PRD.md                 # 제품 요구사항 정의서
 │   ├── MOM_TEST.md            # Mom Test 검증 보고서
 │   ├── CODE_SMELL.md          # src 코드 스멜 분석
-│   ├── test_plan.md           # 테스트 계획서
-│   └── defect_list.md         # QA 결함 목록 (22건, 완료/잔여)
+│   ├── test_plan.md           # 테스트 계획서 (v1.1)
+│   ├── CSV_FORMAT.md          # CSV 업로드 규격 (3-B)
+│   ├── ADR-001-category-main-only.md  # 카테고리 main-only 정책
+│   └── defect_list.md         # QA 결함 23건 (완료 21 · 부분 3)
 ├── report/                    # Red/Green 산출물 (green_step0~6, 01.red 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
@@ -166,7 +168,7 @@ FeedbackAnalyzer_10/
 ## 카테고리 분류 정책
 
 - **main 키워드만** 본문 substring 매칭 (`matches_category`) — [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)
-- `kw()` 집계와 필터 드롭다운 건수 **동일 규칙** (B-02)
+- `analyze_keywords()` 집계와 필터 드롭다운 건수 **동일 규칙** (B-02)
 - `constants`의 `sub` 맵은 v1에서 매칭에 사용하지 않음
 
 ---
@@ -175,15 +177,22 @@ FeedbackAnalyzer_10/
 
 [project_purpose.md](project_purpose.md) 8단계 미션 + [CODE_SMELL.md](doc/CODE_SMELL.md) 스멜 ID를 매핑한 체크리스트입니다. **TDD: Red → Green → Refactor** 순서를 권장합니다.
 
-### 진행 현황 (2026-05-22 · 브랜치 `green`)
+### 진행 현황 (2026-05-22 · 브랜치 **`refactor`**)
 
 | Phase | 상태 | 비고 |
 |-------|------|------|
-| Phase 0 | **대부분 완료** | 문서·스멜 분석 완료 · `python app.py` 수동 확인 `[ ]` |
-| Phase 1 | **완료** | Domain 6 + IT 8 + Golden 1 · **39 passed** · cov **97.4%** |
-| Phase 2 | **B-01~B-06 완료** | Green Step 0~6 · [report/](report/) · [defect_list.md](doc/defect_list.md) |
-| Phase 3 | **완료** (`refactor`) | 3-A~B 문서 ✅ · **3-C-1~7·3-D Gate ✅** |
-| Phase 4~6 | **미착수** | 구조·Trend·DB·리뷰 |
+| Phase 0 | **대부분 완료** | 문서·스멜·Red/Green 재현 ✅ · 수동 E2E `[ ]` |
+| Phase 1 | **완료** (`green`) | pytest · cov 90%+ · Golden Master |
+| Phase 2 | **완료** (`green`) | B-01~B-06 · [report/02.green.md](report/02.green.md) |
+| Phase 3 | **완료** (`refactor`) | 3-A~B 문서 · **3-C-1~7** · **3-D Gate** |
+| Phase 4~6 | **미착수** | 구조 분리(선택) · Trend·DB · 팀 리뷰·발표 |
+
+| 지표 (`refactor` 최신) | 수치 |
+|------------------------|------|
+| pytest | **50 passed** |
+| 커버리지 | **97.78%** |
+| Golden Master | **pass** (`--check`) |
+| QA 결함 | 완료 **21** · 부분 **3** (DEF-020~022) · 미완료 **0** ([defect_list.md](doc/defect_list.md)) |
 
 **테스트 실행** (`src/python`):
 
@@ -199,7 +208,9 @@ pytest tests/domain/test_golden_master.py -v
 python scripts/generate_golden_master.py --check
 ```
 
-**Green 단계 커밋 (`green`):** `Red 기준선 재확인` → `감정 규칙 단일화` → `카테고리 main 규칙 통일` → `Gate 확인` → `부수 정리` → `B-03~B-06 적용` → `Step 6 테스트·UX 보완`
+**Green 커밋 (`green`):** `Red 기준선` → `감정·카테고리 SSOT` → `B-03~B-06` → `Step 6` → `green 진행`
+
+**Refactor 커밋 (`refactor`):** `CSV 규칙·main-only 정책 문서` → `global_sent, global_kw 제거` → `render_page 분리` → `file_handler 제거` → `Logger UI 토글` → `contains_any 공통 유틸` → `분석 전략 패턴 적용` → `sent/kw 네이밍 개선`
 
 ---
 
@@ -220,7 +231,7 @@ python scripts/generate_golden_master.py --check
 
 **Green 합격 조건 (Domain 최소)** — [x] PRD 예시 부정·배송 필터 · [x] 중립 3건 일치 · [x] `"품질"` main only 일치
 
-**QA 잔여** — [doc/defect_list.md](doc/defect_list.md): 미완료 6건 (Phase 3 Refactor·doc 동기화)
+**QA (Green 후)** — 기능·구조 DEF **완료**. 문서·발표 DEF-020~022는 Phase 6에서 종결 ([defect_list.md](doc/defect_list.md)).
 
 ---
 
@@ -245,7 +256,7 @@ python scripts/generate_golden_master.py --check
   - [x] PRD 예시 → `sent` 부정, `filter(부정,배송)` ≥1 (B-01, B-02)
   - [x] 중립 3건 → 분석·필터 건수 일치 (B-01)
   - [x] `"품질"` only → `kw` vs `filter(품질)` 일치 (B-02)
-- [x] 스멜 체크: [CODE_SMELL.md](doc/CODE_SMELL.md) — `S_KEYWORDS`·`fil_data` 등 Green에서 일부 해소, God Function 등 Phase 3 잔여
+- [x] 스멜 체크: [CODE_SMELL.md](doc/CODE_SMELL.md) — Green 버그 스멜 해소 · **Phase 3** God Function·Lava Flow·네이밍·전략 ✅
 
 ### Phase 1 — 테스트 기반 구축 (약 2시간)
 
@@ -257,7 +268,7 @@ python scripts/generate_golden_master.py --check
   - [x] PRD 예시 · 중립 3건 · 카테고리 `main` only (Mom Test §8)
 - [x] 단위 테스트 확장 — `test_session`, `test_logger`, `test_feedback`, `test_csv_parse` 등
 - [x] 통합 테스트 — `tests/boundary/test_routes_analyze_filter.py` (IT-01~04)
-- [x] `pytest tests/ --cov --cov-fail-under=90` → **97.4%** ([report/green_step6_tests.md](report/green_step6_tests.md))
+- [x] `pytest tests/ --cov --cov-fail-under=90` → **97.78%** (`refactor`, [report/green_step6_tests.md](report/green_step6_tests.md))
 - [x] Golden Master — `test_golden_master.py` + `golden_master_expected.txt`
 
 ### Phase 2 — 버그 수정·UX (약 1.5시간)
@@ -271,14 +282,22 @@ python scripts/generate_golden_master.py --check
 | B-03 | S-A03 | `fil_data` 제거 → `Session.download_feedbacks` | [x] |
 | B-04 | S-A06 | CSV `text` 컬럼 헤더 파싱 | [x] |
 | B-05 | S-A07 | 업로드 후 분석·안내 문구 | [x] |
-| B-06 | S-L02 | warning/error 페이지 표시 (`Logger.show_*_on_page`) | [x] |
+| B-06 | S-L02 | warning/error/info 페이지 + `/settings/logs` 토글 (3-C-4) | [x] |
 
 - [x] Domain 테스트 **Green** 확인 (6 passed)
 - [x] 멀티라인 입력 UX (textarea `rows=6`, 줄 단위 `/analyze`)
 - [x] `filters.py` 디버그 `print` 제거 (S-F04)
 
-### Phase 3 — 코드 품질·스멜 제거 (약 2.5시간)
+### Phase 3 — 코드 품질·스멜 제거 (약 2.5시간) ✅
 
+#### 3-A · 문서 초안
+- [x] [MOM_TEST.md](doc/MOM_TEST.md) §7 Partial Go · §8 자동 `[x]` (로컬, 커밋 대기 가능)
+- [x] [test_plan.md](doc/test_plan.md) v1.1 Green Gate
+
+#### 3-B · 설계·정책
+- [x] [CSV_FORMAT.md](doc/CSV_FORMAT.md) · [ADR-001](doc/ADR-001-category-main-only.md)
+
+#### 3-C · Refactor 구현
 - [x] 네이밍: `analyze_sentiments`, `analyze_keywords` (S-T01, 3-C-5)
 - [x] `fil_data` 제거 (B-03) / [x] `global_sent`, `global_kw` (S-T02, 3-C-1)
 - [x] `contains_any()` — `text_utils.py` (S-T03, 3-C-6)
@@ -286,7 +305,12 @@ python scripts/generate_golden_master.py --check
 - [x] `file_handler.py` 삭제 — 다운로드는 `Session`/`app.download` (S-FH01, 3-C-3)
 - [x] Logger UI 토글 — `POST /settings/logs` (warning/error/info, 3-C-4, DEF-008)
 - [x] `analysis_strategies.py` — RuleBased 감정·카테고리 전략 (3-C-7)
-- [x] README 주요 기능 문구 완화 (건수 통계·규칙 기반 명시) / [ ] 차트 등 시각화 추가는 선택
+
+#### 3-D · Gate
+- [x] `pytest tests/ --cov --cov-fail-under=90` — **50 passed**, cov **97.78%**
+- [x] `python scripts/generate_golden_master.py --check` OK
+
+- [x] README 주요 기능 문구 완화 / [ ] 차트·Trend는 Phase 5 선택
 
 ### Phase 4 — 구조·모델 (선택)
 
@@ -318,7 +342,7 @@ python scripts/generate_golden_master.py --check
 | 배송+부정 0건 | S-F03, S-T04 | ✅ B-01, B-02 | filters, constants |
 | 다운로드 빈/불일치 | S-A03 | ✅ B-03 | app, session |
 | CSV text 무시 | S-A06 | ✅ B-04 | app |
-| 로그 UI 없음 | S-L02 | ✅ B-06 | logger, app |
+| 로그 UI·토글 | S-L02 | ✅ B-06, 3-C-4 | logger, `/settings/logs` |
 | God Function / 죽은 코드 | S-A01, S-FH01 | ✅ Phase 3 | `html_renderer`, Lava Flow 제거 |
 
 상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4 · QA: [doc/defect_list.md](doc/defect_list.md)

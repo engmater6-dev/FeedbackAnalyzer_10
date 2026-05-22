@@ -2,10 +2,12 @@
 
 | 항목 | 내용 |
 |------|------|
+| 문서 버전 | 1.1 (Phase 3-A 초안) |
 | 일자 | 2026-05-22 |
-| 방법 | Rob Fitzpatrick *The Mom Test* 원칙 + 실제 코드 시나리오 검증 |
-| 대상 | 제품 가설(README/PRD) vs As-Is 구현 |
-| 브랜치 | `spec` |
+| 방법 | Rob Fitzpatrick *The Mom Test* 원칙 + 실제 코드·pytest 검증 |
+| 대상 | 제품 가설(README/PRD) vs 구현 (`green` / `refactor`) |
+| 브랜치 | `green` (Green 완료) · Phase 3 문서 작업: `refactor` |
+| 자동 검증 | **39 passed** · cov **97.42%** · Golden Master pass ([test_plan.md](test_plan.md), [report/02.green.md](../report/02.green.md)) |
 
 ---
 
@@ -20,20 +22,22 @@
 
 ## 2. 검증한 핵심 가설
 
-| ID | 가설 (문서/기능 설명) | Mom Test 판정 |
-|----|----------------------|---------------|
-| H-01 | “고객 피드백을 감정·카테고리로 분류한다” | ⚠️ **부분 검증** — 규칙·키워드 불일치로 결과 신뢰 낮음 |
-| H-02 | “중립 필터로 중립 피드백만 볼 수 있다” | ❌ **기각** — 분석 2건 vs 필터 1건 불일치 |
-| H-03 | “배송 관련 피드백을 필터한다” | ⚠️ **조건부** — 본문에 sub 키워드 있을 때만; PRD 예시는 실패 |
-| H-04 | “부정+배송 조합으로 문제 VOC를 찾는다” | ❌ **기각** — PRD 예시 문장에서 0건 |
-| H-05 | “CSV `text` 컬럼으로 업로드한다” | ❌ **미검증/불일치** — 구현은 0번 컬럼만 |
-| H-06 | “실습용 리팩토링 챌린지” | ✅ **검증** — 스멸·버그가 학습 목적과 일치 |
+| ID | 가설 (문서/기능 설명) | Red (`spec`/`red`) | Green 재판정 (2026-05-22) |
+|----|----------------------|--------------------|---------------------------|
+| H-01 | “고객 피드백을 감정·카테고리로 분류한다” | ⚠️ 규칙 불일치 | ⚠️ **부분 검증** — SSOT 통일·Anchor Pass. ML 아님·키워드 한계는 잔존 |
+| H-02 | “중립 필터로 중립 피드백만 볼 수 있다” | ❌ 기각 | ✅ **검증** — `classify_sentiment()` 단일화, Domain 회귀 Pass |
+| H-03 | “배송 관련 피드백을 필터한다” | ⚠️ PRD 예시 실패 | ✅ **검증** (Anchor·`품질` main) — **main-only** 설계, sub-only 본문은 정책 이슈(DEF-016) |
+| H-04 | “부정+배송 조합으로 문제 VOC를 찾는다” | ❌ 기각 | ✅ **검증** — PRD 예시 `filter(부정, 배송)` ≥1건 (B-01, B-02) |
+| H-05 | “CSV `text` 컬럼으로 업로드한다” | ❌ 0열만 | ✅ **검증** — `_parse_csv_to_feedbacks`, IT Pass (B-04) |
+| H-06 | “실습용 리팩토링 챌린지” | ✅ 검증 | ✅ **유지** — Phase 3 스멸 잔여가 커리큘럼과 일치 |
 
 ---
 
 ## 3. 런타임 검증 결과 (증거)
 
-### 3.1 PRD 시나리오 예시 (가장 중요)
+> **§3.1~3.3** — TDD **Red** 기준선(2026-05-22 초기). **Green 재검증**은 §3.4·§8·pytest Gate.
+
+### 3.1 PRD 시나리오 예시 (가장 중요) — Red 기준선
 
 **입력**: `"배송이 너무 늦어요. 화가 납니다."`  
 **문서 기대**: 감정=부정, 카테고리=배송
@@ -50,7 +54,7 @@
 
 → **“감정 분석 기능이 있다”는 말은 맞지만, 의사결정에 쓸 수준은 아니다.**
 
-### 3.2 중립 필터 (미션 3 버그)
+### 3.2 중립 필터 (미션 3 버그) — Red 기준선
 
 **입력 3건**: 보통/괜찮/특별한 불만 없음 등
 
@@ -61,7 +65,7 @@
 
 → 사용자 인터뷰에서 나올 말: *“중립만 보려는데 왜 개수가 달라요?”* — **기능 신뢰 붕괴**.
 
-### 3.3 배송 카테고리
+### 3.3 배송 카테고리 — Red 기준선
 
 **입력**: `배송이 너무 늦어요`, `택배가 빨라요 좋아요`
 
@@ -71,6 +75,21 @@
 | `filter(..., '배송')` | 2건 |
 
 → 이 샘플에서는 통과. 다만 `filter`가 `main` 키워드를 스킵하므로 **“배송”만 포함된 짧은 문장**은 놓칠 수 있음 (구조적 리스크).
+
+### 3.4 Green 재검증 (2026-05-22 · `green` 브랜치)
+
+**근거:** Domain Anchor 6건 · boundary IT · `pytest tests/ --cov-fail-under=90` · Golden Master `golden_master_expected.txt`
+
+| 검사 | Green 결과 | 테스트·PRD |
+|------|------------|------------|
+| PRD 예시 `sent` | 부정 1, 중립 0, 긍정 0 | TP-ANCHOR-01, B-01 |
+| PRD 예시 `filter(부정, 배송)` | ≥1건 | TP-ANCHOR-03, B-01/B-02 |
+| 중립 3건 | `sent` 중립 수 = `filter(중립)` | UT-10, `test_filters_regression` |
+| `"품질"` only | `kw` = `filter(품질)` | B-02, `matches_category()` |
+| CSV `text` 헤더 | 업로드·집계 IT Pass | B-04, IT-04 |
+| 전체 회귀 | **39 passed**, cov **97.42%** | [report/02.green.md](../report/02.green.md) |
+
+**Mom Test 해석:** 문서·PRD에 적힌 **대표 시나리오**는 자동 검증으로 **신뢰 회복**. 다만 §4.1의 “시각화·검색·ML 감정분석” 과장, Phase 3 구조 부채(God Function 등)는 **실무 Go**를 막는 요인으로 남음 → §7 **Partial Go**.
 
 ---
 
@@ -110,7 +129,7 @@
 | 페르소나 | Mom Test 결론 |
 |----------|----------------|
 | **학습자** | ✅ 시간 투자 가치 있음 (리팩토링·TDD) |
-| **실무 CS 리더** | ⚠️ 현 As-Is로는 보고서 대체 불가 — B-01~B-04 수정 후 재검증 필요 |
+| **실무 CS 리더** | ⚠️ **Partial** — Anchor·IT 통과, 1차 스크리닝 가능. 추이·고급 시각화·인터뷰 검증 전까지 보고서 완전 대체는 어려움 |
 | **경영진** | ❌ “대시보드”만으로는 의사결정 근거 부족 (추이·신뢰도·샘플링 필요) |
 
 ---
@@ -148,30 +167,81 @@
 
 ## 7. Mom Test 최종 판정
 
+### 7.1 Red 시점 (2026-05-22 초기 · `spec`/`red`)
+
 | 관점 | 판정 | 한 줄 요약 |
 |------|------|------------|
 | **교육 제품** | ✅ Pass | 버그·스멸이 커리큘럼과 일치 |
-| **VOC 분석 도구 (실무)** | ❌ Fail (현재) | PRD 대표 시나리오가 동작하지 않음 |
-| **문서 정직성** | ⚠️ Partial | 기능명이 실제 능력보다 큼 (검색, 시각화, 감정분석) |
+| **VOC 분석 도구 (실무)** | ❌ Fail | PRD 대표 시나리오 미동작 |
+| **문서 정직성** | ⚠️ Partial | 기능명이 실제 능력보다 큼 |
 
-**Go / No-Go (실무 배포)**  
-- **No-Go** — Phase 2 버그 수정 + Mom Test 재실행 전까지.  
-- **Go (학습 시작)** — 즉시 가능. Phase 0 체크리스트의 “버그 재현”이 곧 Mom Test 증거 수집이다.
+**Go / No-Go (Red):** 실무 **No-Go** · 학습 **Go**.
+
+### 7.2 Green 재판정 (Phase 3-A · 2026-05-22 · `green`)
+
+| 관점 | 판정 | 한 줄 요약 |
+|------|------|------------|
+| **교육 제품** | ✅ Pass | Green·테스트·Golden Master 완료, Phase 3 Refactor 잔여 |
+| **VOC 분석 도구 (실무)** | ⚠️ **Partial Go** | Domain·IT·PRD Anchor **Pass** — **1차 VOC 스크리닝** 수준. Trend·DB·인터뷰·구조 개선 전 **완전 대체 불가** |
+| **문서 정직성** | ⚠️ Partial | README “건수 통계·규칙 기반” 완화(2026-05-22). 차트·자유 검색 표현은 Phase 5/6에서 정리 |
+
+**Partial Go 근거 (자동 검증)**
+
+1. **Domain Gate** — Mom Test §8 항목 1~3 + CSV: pytest Domain·Anchor **6 passed**.  
+2. **Boundary Gate** — `/analyze`, `/filter`, `/upload`, `/download` IT Pass (B-03~B-06).  
+3. **회귀** — 전체 **39 passed**, cov **97.42%**, Golden Master `--check` OK.  
+4. **잔여 리스크** — 규칙 기반 substring 한계, main-only 카테고리(DEF-016), God Function·전역 상태(Phase 3), 실사용자 인터뷰 미수행.
+
+**Go / No-Go (Green 후)**
+
+| 대상 | 판정 |
+|------|------|
+| **학습 (Phase 3 Refactor)** | ✅ **Go** — 즉시 `refactor` 브랜치 착수 |
+| **실무 1차 스크리닝 (파일럿)** | ⚠️ **Partial Go** — Anchor·필터·CSV 경로 신뢰. 보고서·경영 의사결정용은 Phase 5~6·인터뷰 후 |
+| **실무 정식 배포** | **No-Go** — Phase 3~6 Gate·인터뷰(선택) 미충족 |
 
 ---
 
-## 8. 재검증 체크리스트 (수정 후 Mom Test 재실행)
+## 8. 재검증 체크리스트 (Green 후 · Phase 3-A)
 
-- [ ] PRD 예시 문장: `sent` → 부정, `filter(부정, 배송)` → ≥1건  
-- [ ] 중립 3건 샘플: `sent` 중립 수 = `filter(중립)` 건수  
-- [ ] “배송” only 본문: `kw`와 `filter(배송)` 일치  
-- [ ] CSV `text` 헤더 파일 업로드 후 건수 일치  
-- [ ] 실 사용자 3인 인터뷰 노트 `report/`에 첨부 (선택)
+**자동 검증 (pytest · 2026-05-22 `green`)**
+
+- [x] PRD 예시 문장: `sent` → 부정, `filter(부정, 배송)` → ≥1건 — `test_anchor_prd_example`, TP-ANCHOR-01/03  
+- [x] 중립 3건 샘플: `sent` 중립 수 = `filter(중립)` 건수 — `test_filters_regression`  
+- [x] `"품질"` only 본문: `kw`와 `filter(품질)` 일치 (main-only) — Domain 회귀  
+- [x] CSV `text` 헤더 파일 업로드 후 건수·집계 — `test_csv_parse`, boundary IT  
+- [x] Golden Master 스냅샷 — `test_golden_master`, `generate_golden_master.py --check`
+
+**수동·선택 (Phase 0 / Phase 6)**
+
+- [ ] 브라우저 수동 E2E — `report/manual_e2e_phase0.md` (Phase 0 Gate)  
+- [ ] 실 사용자 3인 인터뷰 노트 `report/` (선택 · Trend/DB Go/No-Go)
+
+**명령 (유지보수)**
+
+```bash
+cd src/python
+pytest tests/domain/test_anchor_prd_example.py tests/domain/test_filters_regression.py -v
+pytest tests/ --cov --cov-fail-under=90 -q
+python scripts/generate_golden_master.py --check
+```
 
 ---
 
 ## 9. 참고
 
 - [PRD.md](PRD.md) §4 버그 목록  
-- [README.md](../README.md) To Do List Phase 0~2  
+- [README.md](../README.md) To Do List Phase 0~6  
+- [test_plan.md](test_plan.md) v1.1 — Green Gate  
+- [defect_list.md](defect_list.md) DEF-020  
+- [report/02.green.md](../report/02.green.md)  
 - Rob Fitzpatrick, *The Mom Test* (2013)
+
+---
+
+## 10. 변경 이력
+
+| 버전 | 일자 | 변경 |
+|------|------|------|
+| 1.0 | 2026-05-22 | 초안 — Red 기준선, VOC Fail |
+| 1.1 | 2026-05-22 | Phase 3-A — §3.4 Green 재검증, §7 Partial Go, §8 자동 4항목 `[x]` |
