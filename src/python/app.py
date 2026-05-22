@@ -51,7 +51,7 @@ def render_page(
         .form-group {{ margin-bottom: 15px; }}
         label {{ display: block; margin-bottom: 5px; font-weight: bold; color: #555; }}
         input[type="text"], textarea, select {{ width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; box-sizing: border-box; }}
-        textarea {{ height: 100px; resize: vertical; }}
+        textarea {{ min-height: 120px; height: auto; resize: vertical; white-space: pre-wrap; }}
         button {{ background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-right: 10px; }}
         button:hover {{ background-color: #0056b3; }}
         .btn-success {{ background-color: #28a745; }}
@@ -80,7 +80,7 @@ def render_page(
         <form action="/analyze" method="post">
             <div class="form-group">
                 <label for="text">피드백 텍스트:</label>
-                <textarea id="text" name="text" placeholder="피드백을 입력하세요..."></textarea>
+                <textarea id="text" name="text" rows="6" placeholder="한 줄에 피드백 하나. Enter로 여러 줄 입력 가능합니다."></textarea>
             </div>
             <button type="submit">입력하기</button>
         </form>
@@ -172,10 +172,12 @@ def analyze():
     global fil_data
     try:
         feedbacks = Session.get_current_feedbacks()
-        text = request.form.get("text", "").strip()
+        text = request.form.get("text", "")
 
-        if text:
-            feedbacks.append(Feedback(text))
+        for line in text.splitlines():
+            line = line.strip()
+            if line:
+                feedbacks.append(Feedback(line))
 
         for fb in feedbacks:
             Logger.log_info(fb.text)

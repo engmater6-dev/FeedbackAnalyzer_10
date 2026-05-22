@@ -28,7 +28,4 @@ def filter_feedbacks(
     else:
         final_filtered = tmp_filtered
 
-    for fb in final_filtered:
-        print(fb.text)
-
     return final_filtered
