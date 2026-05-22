@@ -93,8 +93,8 @@ def analyze():
         keyword_results = {}
 
         if feedbacks:
-            sentiment_results = text_analyzer.sent(feedbacks)
-            keyword_results = text_analyzer.kw(feedbacks)
+            sentiment_results = text_analyzer.analyze_sentiments(feedbacks)
+            keyword_results = text_analyzer.analyze_keywords(feedbacks)
             Logger.log_info("감성 분석 완료")
             Logger.log_info("키워드 분석 완료")
 
@@ -130,8 +130,8 @@ def upload():
         sentiment_results = {}
         keyword_results = {}
         if feedbacks:
-            sentiment_results = text_analyzer.sent(feedbacks)
-            keyword_results = text_analyzer.kw(feedbacks)
+            sentiment_results = text_analyzer.analyze_sentiments(feedbacks)
+            keyword_results = text_analyzer.analyze_keywords(feedbacks)
 
         if added:
             success = (
@@ -164,8 +164,8 @@ def filter_route():
             filtered = filter_feedbacks(feedbacks, sentiment, keyword)
             if filtered:
                 Session.set_download_feedbacks(filtered)
-                sentiment_results = text_analyzer.sent(filtered)
-                keyword_results = text_analyzer.kw(filtered)
+                sentiment_results = text_analyzer.analyze_sentiments(filtered)
+                keyword_results = text_analyzer.analyze_keywords(filtered)
                 Logger.log_info(f"필터링 결과: {len(filtered)}개의 피드백")
                 return render_page(
                     sentiment_results=sentiment_results,

@@ -17,6 +17,6 @@ class TestTextAnalyzerUnit:
 
     def test_kw_counts_multiple_categories(self):
         feedbacks = [Feedback("배송도 늦고 품질도 나쁩니다")]
-        result = TextAnalyzer().kw(feedbacks)
+        result = TextAnalyzer().analyze_keywords(feedbacks)
         assert result["배송"] >= 1
         assert result["품질"] >= 1

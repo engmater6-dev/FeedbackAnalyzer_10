@@ -32,8 +32,8 @@ def capture_golden_master_output() -> str:
     lines.append("[anchor_prd]")
     lines.append(f"input={ANCHOR_TEXT}")
     lines.append(f"classify_sentiment={classify_sentiment(ANCHOR_TEXT)}")
-    lines.append(f"sent={_fmt_counts(analyzer.sent(anchor))}")
-    lines.append(f"kw={_fmt_counts(analyzer.kw(anchor))}")
+    lines.append(f"sent={_fmt_counts(analyzer.analyze_sentiments(anchor))}")
+    lines.append(f"kw={_fmt_counts(analyzer.analyze_keywords(anchor))}")
     neg_ship = filter_feedbacks(anchor, "부정", "배송")
     lines.append(f"filter_negative_shipping_count={len(neg_ship)}")
     lines.append(
@@ -48,7 +48,7 @@ def capture_golden_master_output() -> str:
     lines.append("[neutral_three]")
     for index, text in enumerate(NEUTRAL_THREE_TEXTS, start=1):
         lines.append(f"line{index}={text}|sentiment={classify_sentiment(text)}")
-    lines.append(f"sent={_fmt_counts(analyzer.sent(neutral))}")
+    lines.append(f"sent={_fmt_counts(analyzer.analyze_sentiments(neutral))}")
     neutral_filtered = filter_feedbacks(neutral, "중립", "전체")
     lines.append(f"filter_neutral_count={len(neutral_filtered)}")
     lines.append("")
@@ -56,7 +56,7 @@ def capture_golden_master_output() -> str:
     quality = [Feedback(CATEGORY_MAIN_TEXT)]
     lines.append("[category_main_only]")
     lines.append(f"input={CATEGORY_MAIN_TEXT}")
-    lines.append(f"kw={_fmt_counts(analyzer.kw(quality))}")
+    lines.append(f"kw={_fmt_counts(analyzer.analyze_keywords(quality))}")
     quality_filtered = filter_feedbacks(quality, "전체", "품질")
     lines.append(f"filter_quality_count={len(quality_filtered)}")
     lines.append("")

@@ -40,8 +40,10 @@
 | S-T02 | — | `global_sent`/`global_kw` 클래스 변수 제거 (3-C-1) | ✅ |
 | S-A01, S-A02 | — | `HtmlRenderer` / `html_renderer.py` (3-C-2) | ✅ |
 | S-FH01, S-FH02 | — | `file_handler.py` 삭제 (3-C-3) | ✅ |
+| S-T01, S-T03 | — | 네이밍·contains_any (3-C-5~6) | ✅ |
+| — | — | `analysis_strategies` (3-C-7) | ✅ |
 
-**Phase 3-C 잔여:** S-T01, S-T03, S-S01~S-S02, 3-C-5~7(선택) 등
+**Phase 3-C:** ✅ 완료 · Phase 4~6·문서 DEF-020~022 잔여
 
 ---
 
@@ -63,9 +65,9 @@
 
 | ID | 스멜 | 심각도 | 위치·설명 |
 |----|------|--------|-----------|
-| S-T01 | 부적절한 네이밍 | Med | `sent`, `kw` |
+| S-T01 | 부적절한 네이밍 | Med | ~~`sent`, `kw`~~ → **✅ 3-C-5** `analyze_sentiments`/`analyze_keywords` |
 | S-T02 | 클래스 변수 부작용 | High | ~~`global_sent`, `global_kw`~~ → **✅ 3-C-1** 제거 |
-| S-T03 | 중복 `_contains_any` | High | `filters.py`와 동일 |
+| S-T03 | 중복 `_contains_any` | High | ~~중복~~ → **✅ 3-C-6** `text_utils.contains_any` |
 | S-T04 | 불완전한 감정 규칙 | High | ~~B-01~~ → **✅ Green** `classify_sentiment()` |
 | S-T05 | `kw()` main만 매칭 | High | ~~B-02~~ → **✅ Green** `matches_category()` ([ADR-001](ADR-001-category-main-only.md)) |
 
@@ -162,7 +164,7 @@
 3. ~~`fil_data` 제거~~ — **✅ Green**  
 4. ~~`render_page` → HtmlRenderer~~ — **✅ 3-C-2**  
 5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
-6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · ~~`file_handler`~~ — **✅ 3-C-3** · 네이밍 — **⏳**  
+6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · ~~`file_handler`~~ — **✅ 3-C-3** · ~~네이밍·contains_any·전략~~ — **✅ 3-C-5~7**  
 
 ---
 

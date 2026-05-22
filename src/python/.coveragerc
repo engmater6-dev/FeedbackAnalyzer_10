@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = text_analyzer, filters, constants, feedback, session, app, logger, html_renderer
+source = text_analyzer, filters, constants, feedback, session, app, logger, html_renderer, text_utils, analysis_strategies
 omit =
     */tests/*
 

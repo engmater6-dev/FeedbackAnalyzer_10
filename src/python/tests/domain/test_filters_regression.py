@@ -36,7 +36,7 @@ class TestNeutralFilterConsistency:
     def test_sent_neutral_count_equals_filter_neutral_count(
         self, neutral_three_feedbacks
     ):
-        sent_result = TextAnalyzer().sent(neutral_three_feedbacks)
+        sent_result = TextAnalyzer().analyze_sentiments(neutral_three_feedbacks)
         filtered = filter_feedbacks(neutral_three_feedbacks, "중립", "전체")
 
         assert sent_result["중립"] == len(filtered)
@@ -51,7 +51,7 @@ class TestCategoryMainOnlyConsistency:
     def test_kw_category_count_equals_filter_category_count(
         self, category_main_only_feedbacks
     ):
-        kw_result = TextAnalyzer().kw(category_main_only_feedbacks)
+        kw_result = TextAnalyzer().analyze_keywords(category_main_only_feedbacks)
         filtered = filter_feedbacks(
             category_main_only_feedbacks, "전체", "품질"
         )

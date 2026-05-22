@@ -25,14 +25,14 @@ class TestAnchorPrdExample:
     """test_plan TP-ANCHOR-01 ~ 04"""
 
     def test_sent_classifies_anchor_as_negative(self, anchor_feedbacks):
-        result = TextAnalyzer().sent(anchor_feedbacks)
+        result = TextAnalyzer().analyze_sentiments(anchor_feedbacks)
 
         assert result["부정"] == 1
         assert result["중립"] == 0
         assert result["긍정"] == 0
 
     def test_kw_classifies_anchor_as_shipping(self, anchor_feedbacks):
-        result = TextAnalyzer().kw(anchor_feedbacks)
+        result = TextAnalyzer().analyze_keywords(anchor_feedbacks)
 
         assert result["배송"] == 1
 
@@ -47,7 +47,7 @@ class TestAnchorPrdExample:
     def test_sent_negative_count_matches_filter_negative_all(
         self, anchor_feedbacks
     ):
-        sent_result = TextAnalyzer().sent(anchor_feedbacks)
+        sent_result = TextAnalyzer().analyze_sentiments(anchor_feedbacks)
         filtered = filter_feedbacks(anchor_feedbacks, "부정", "전체")
 
         assert sent_result["부정"] == len(filtered)

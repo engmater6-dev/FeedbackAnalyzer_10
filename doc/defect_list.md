@@ -214,19 +214,19 @@ python scripts/generate_golden_master.py --check
 | 3-C-2 | [x] | `render_page` → `html_renderer.HtmlRenderer` 분리 | 017 | `app.py` ~200줄 감소 |
 | 3-C-3 | [x] | `file_handler.py` 삭제 (download는 `Session`/`app`) | 019 | Lava Flow 제거 |
 | 3-C-4 | [x] | Logger **UI 토글** (warning/error/info, `/settings/logs`) | 008 | boundary IT |
-| 3-C-5 | [ ] | `sent`/`kw` 네이밍 개선 (선택·회귀 주의) | S-T01 | Golden Master diff 검토 |
-| 3-C-6 | [ ] | `_contains_any` 공통 유틸 1곳 (선택) | S-T03 | 중복 제거 |
-| 3-C-7 | [ ] | 리팩터링 1건 추가 (전략/Extract Class) | — | README 체크 |
+| 3-C-5 | [x] | `analyze_sentiments` / `analyze_keywords` | S-T01 | Golden Master pass |
+| 3-C-6 | [x] | `text_utils.contains_any` | S-T03 | 단일 모듈 |
+| 3-C-7 | [x] | `analysis_strategies.py` 전략 패턴 | — | RuleBasedSentiment/Category |
 
 #### 3-D. Phase 3 종료 검증 (15분)
 
 | 순서 | 체크 | 작업 |
 |------|------|------|
-| 3-D-1 | [ ] | `pytest tests/ --cov --cov-fail-under=90` |
-| 3-D-2 | [ ] | Golden Master 불변 시 pass / 변경 시 `--force` + 리뷰 |
-| 3-D-3 | [ ] | `defect_list.md` §2: 017~019,008 → **완료**, 015→완료 또는 유지 |
+| 3-D-1 | [x] | `pytest tests/ --cov --cov-fail-under=90` — **50 passed**, cov **97.78%** |
+| 3-D-2 | [x] | Golden Master `--check` OK |
+| 3-D-3 | [x] | §2 구조·UX DEF 008~019 완료 |
 
-**Phase 3 Gate:** 3-C-1~3-C-4 완료 + 3-D-1 pass
+**Phase 3 Gate:** 3-C-1~3-C-7 완료 + 3-D-1~3 pass ✅
 
 ---
 
@@ -353,3 +353,4 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Phase 3-C-2 — `html_renderer.py`, DEF-017 완료 |
 | 2026-05-22 | Phase 3-C-3 — `file_handler.py` 삭제, DEF-019 완료 |
 | 2026-05-22 | Phase 3-C-4 — Logger UI 토글, DEF-008 완료 |
+| 2026-05-22 | Phase 3-C-5~7 — 네이밍·text_utils·전략패턴, 3-D Gate |
