@@ -1,0 +1,14 @@
+[run]
+branch = True
+source = text_analyzer, filters, constants, feedback, session, app, logger
+omit =
+    file_handler.py
+    */tests/*
+
+[report]
+precision = 2
+show_missing = True
+skip_covered = False
+
+[html]
+directory = ../../report/coverage_html

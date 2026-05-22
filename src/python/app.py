@@ -46,6 +46,11 @@ def _current_timestamp() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
+def _begin_page_request():
+    """Per-request UI log buffer (avoids cross-request accumulation)."""
+    Logger._ui_logs = []
+
+
 def render_page(
     success: str = "",
     warning: str = "",
@@ -174,7 +179,12 @@ def render_page(
                     f'<div class="stat-label">{label}</div></div>'
                 )
             html += "</div>"
-        html += '<a href="/download"><button class="btn-success">결과 다운로드</button></a></div>'
+        if Session.get_download_feedbacks():
+            html += (
+                '<a href="/download">'
+                '<button class="btn-success">결과 다운로드</button></a>'
+            )
+        html += "</div>"
 
     if error:
         html += f'<p class="alert alert-danger">{escape(error)}</p>'
@@ -193,6 +203,7 @@ def render_page(
 
 @app.route("/", methods=["GET"])
 def index():
+    _begin_page_request()
     Session.init_session()
     feedbacks = Session.get_current_feedbacks()
     return render_page(success="피드백 분석기 시작", feedbacks=feedbacks)
@@ -200,6 +211,7 @@ def index():
 
 @app.route("/analyze", methods=["POST"])
 def analyze():
+    _begin_page_request()
     try:
         feedbacks = Session.get_current_feedbacks()
         text = request.form.get("text", "")
@@ -240,6 +252,7 @@ def analyze():
 
 @app.route("/upload", methods=["POST"])
 def upload():
+    _begin_page_request()
     try:
         feedbacks = Session.get_current_feedbacks()
         file = request.files.get("file")
@@ -282,6 +295,7 @@ def upload():
 
 @app.route("/filter", methods=["POST"])
 def filter_route():
+    _begin_page_request()
     try:
         feedbacks = Session.get_current_feedbacks()
         sentiment = request.form.get("sentiment", "전체")
@@ -312,10 +326,16 @@ def filter_route():
 
 @app.route("/download", methods=["GET"])
 def download():
+    _begin_page_request()
+    rows = Session.get_download_feedbacks()
+    if not rows:
+        Logger.log_warning("다운로드할 피드백이 없습니다.")
+        return render_page(warning="다운로드할 피드백이 없습니다.")
+
     output = io.StringIO()
     output.write("\ufeff")  # UTF-8 BOM
     output.write("text\n")
-    for fb in Session.get_download_feedbacks():
+    for fb in rows:
         output.write(fb.text + "\n")
 
     return Response(
