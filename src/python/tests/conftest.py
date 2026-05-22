@@ -24,7 +24,13 @@ def reset_session():
     Session.current_feedbacks = []
     Session.download_feedbacks = []
     Logger._ui_logs = []
+    Logger.show_warning_on_page = True
+    Logger.show_error_on_page = True
+    Logger.show_info_on_page = False
     yield
     Session.current_feedbacks = []
     Session.download_feedbacks = []
     Logger._ui_logs = []
+    Logger.show_warning_on_page = True
+    Logger.show_error_on_page = True
+    Logger.show_info_on_page = False

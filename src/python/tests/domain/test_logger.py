@@ -37,3 +37,27 @@ class TestLogger:
         Logger.log_debug("debug msg")
         Logger.set_debug_mode(False)
         Logger.log_debug("hidden")
+
+    def test_info_on_page_when_enabled(self):
+        Logger._ui_logs = []
+        Logger.show_info_on_page = True
+        Logger.log_info("페이지 정보")
+        logs = Logger.get_page_logs()
+        assert len(logs) == 1
+        assert logs[0]["level"] == "info"
+
+    def test_info_hidden_when_disabled(self):
+        Logger._ui_logs = []
+        Logger.show_info_on_page = False
+        Logger.log_info("stdout only")
+        assert Logger.get_page_logs() == []
+
+    def test_apply_display_settings(self):
+        Logger.apply_display_settings(
+            show_warning=False,
+            show_error=True,
+            show_info=True,
+        )
+        assert Logger.show_warning_on_page is False
+        assert Logger.show_error_on_page is True
+        assert Logger.show_info_on_page is True

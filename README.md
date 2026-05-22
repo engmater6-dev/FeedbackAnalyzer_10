@@ -121,7 +121,7 @@ FeedbackAnalyzer_10/
 │   ├── text_analyzer.py       # classify_sentiment(), matches_category(), sent(), kw()
 │   ├── filters.py             # filter_feedbacks() — constants·analyzer 규칙 공유
 │   ├── session.py             # current_feedbacks, download_feedbacks (B-03)
-│   ├── logger.py              # stdout + warning/error UI (B-06)
+│   ├── logger.py              # stdout + level별 페이지 토글 (B-06, 3-C-4)
 │   ├── constants.py           # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS (SSOT)
 │   ├── pytest.ini
 │   ├── requirements.txt
@@ -282,6 +282,7 @@ python scripts/generate_golden_master.py --check
 - [ ] `_contains_any()` 공통 유틸 1곳 (S-T03)
 - [x] `render_page()` 분리 → `html_renderer.HtmlRenderer` (S-A01, S-A02, 3-C-2)
 - [x] `file_handler.py` 삭제 — 다운로드는 `Session`/`app.download` (S-FH01, 3-C-3)
+- [x] Logger UI 토글 — `POST /settings/logs` (warning/error/info, 3-C-4, DEF-008)
 - [ ] 리팩토링 1건 추가 (전략 패턴·Extract Class 등)
 - [x] README 주요 기능 문구 완화 (건수 통계·규칙 기반 명시) / [ ] 차트 등 시각화 추가는 선택
 

@@ -170,3 +170,32 @@ class TestRoutesErrors:
         )
         html = response.get_data(as_text=True)
         assert "오류가 발생" in html
+
+
+@pytest.mark.boundary
+class TestLogSettings:
+    """3-C-4: Logger warning/error/info page toggles."""
+
+    def test_log_settings_form_on_index(self, client):
+        html = client.get("/").get_data(as_text=True)
+        assert "로그 표시 설정" in html
+        assert 'action="/settings/logs"' in html
+
+    def test_disable_warning_hides_buffered_log(self, client):
+        client.post("/settings/logs", data={})
+        html = client.get("/download").get_data(as_text=True)
+        assert "다운로드할 피드백" in html
+        assert "[WARNING]" not in html
+
+    def test_enable_warning_shows_buffered_log(self, client):
+        client.post("/settings/logs", data={"show_warning": "on"})
+        html = client.get("/download").get_data(as_text=True)
+        assert "[WARNING]" in html
+
+    def test_enable_info_shows_on_analyze(self, client):
+        client.post(
+            "/settings/logs",
+            data={"show_warning": "on", "show_error": "on", "show_info": "on"},
+        )
+        html = client.post("/analyze", data={"text": "테스트"}).get_data(as_text=True)
+        assert "[INFO]" in html

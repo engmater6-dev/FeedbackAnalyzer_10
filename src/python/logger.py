@@ -7,6 +7,7 @@ class Logger:
     debug_mode = True
     show_warning_on_page = True
     show_error_on_page = True
+    show_info_on_page = False
     _ui_logs: List[Dict[str, str]] = []
 
     @staticmethod
@@ -25,15 +26,33 @@ class Logger:
     def get_page_logs(cls) -> List[Dict[str, str]]:
         visible = []
         for entry in cls._ui_logs:
-            if entry["level"] == "warning" and cls.show_warning_on_page:
+            level = entry["level"]
+            if level == "warning" and cls.show_warning_on_page:
                 visible.append(entry)
-            elif entry["level"] == "error" and cls.show_error_on_page:
+            elif level == "error" and cls.show_error_on_page:
+                visible.append(entry)
+            elif level == "info" and cls.show_info_on_page:
                 visible.append(entry)
         return visible
 
     @classmethod
+    def apply_display_settings(
+        cls,
+        *,
+        show_warning: bool,
+        show_error: bool,
+        show_info: bool,
+    ) -> None:
+        """Update which log levels appear on the dashboard (3-C-4)."""
+        cls.show_warning_on_page = show_warning
+        cls.show_error_on_page = show_error
+        cls.show_info_on_page = show_info
+
+    @classmethod
     def log_info(cls, message: str):
         print(f"[{cls._timestamp()}] INFO: {message}")
+        if cls.show_info_on_page:
+            cls._append_ui("info", message)
 
     @classmethod
     def log_warning(cls, message: str):

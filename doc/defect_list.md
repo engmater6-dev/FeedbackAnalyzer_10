@@ -16,8 +16,8 @@
 | 구분 | 건수 |
 |------|------|
 | **전체** | 23 |
-| **완료** | 20 |
-| **부분완료** | 4 |
+| **완료** | 21 |
+| **부분완료** | 3 |
 | **미완료** | 0 |
 
 | Severity | 완료 | 미완료·부분 |
@@ -49,7 +49,7 @@
 | DEF-005 | Medium | 기능결함 | Green Step 5 | `/analyze` 후 `/download` | 입력 반영 CSV | 빈/구버전 | `fil_data` | `Session.download_feedbacks` | **완료** |
 | DEF-006 | Medium | 기능결함 | Green Step 5 | CSV `text` 헤더 | `text` 열 파싱 | 0열만 | 미구현 | `_parse_csv_to_feedbacks` | **완료** |
 | DEF-007 | Low | UX | Green Step 5 | 업로드 직후 | 집계 표시 | 없음 | upload 미분석 | upload `sent`/`kw` | **완료** |
-| DEF-008 | Low | UX | Phase 3 | warning/error UI | level별 on/off | stdout만 | Logger UI 없음 | `get_page_logs`, flags | **부분완료** — UI 토글·INFO 없음 |
+| DEF-008 | Low | UX | Phase 3 | warning/error UI | level별 on/off | stdout만 | `/settings/logs`·`apply_display_settings`·INFO 선택 | **완료** |
 | DEF-009 | Low | UX | Green Step 4 | `filter_feedbacks` | stdout 미출력 | `print` | 디버그 | print 제거 | **완료** |
 | DEF-010 | Medium | 테스트결함 | **Green Step 6** | `pytest --cov` | ≥90% | ~39% | IT·app 미측정 | **39** tests, cov **97.42%** | **완료** |
 | DEF-011 | Medium | 테스트결함 | **Green Step 6** | boundary IT | HTTP 검증 | skip | IT 미착수 | IT-01~04 구현 | **완료** |
@@ -213,7 +213,7 @@ python scripts/generate_golden_master.py --check
 | 3-C-1 | [x] | `global_sent`, `global_kw` 제거 | 018 | grep 0건·테스트 pass |
 | 3-C-2 | [x] | `render_page` → `html_renderer.HtmlRenderer` 분리 | 017 | `app.py` ~200줄 감소 |
 | 3-C-3 | [x] | `file_handler.py` 삭제 (download는 `Session`/`app`) | 019 | Lava Flow 제거 |
-| 3-C-4 | [ ] | Logger **UI 토글** (warning/error on/off, 선택 INFO) | 008 | 페이지에서 on/off 확인 |
+| 3-C-4 | [x] | Logger **UI 토글** (warning/error/info, `/settings/logs`) | 008 | boundary IT |
 | 3-C-5 | [ ] | `sent`/`kw` 네이밍 개선 (선택·회귀 주의) | S-T01 | Golden Master diff 검토 |
 | 3-C-6 | [ ] | `_contains_any` 공통 유틸 1곳 (선택) | S-T03 | 중복 제거 |
 | 3-C-7 | [ ] | 리팩터링 1건 추가 (전략/Extract Class) | — | README 체크 |
@@ -328,7 +328,7 @@ python scripts/generate_golden_master.py --check
 
 | ID | 담당 Phase | Phase 6 종결 조건 |
 |----|------------|-------------------|
-| DEF-008 | 3-C-4 | UI 토글 동작 |
+| DEF-008 | 3-C-4 ✅ | `/settings/logs` |
 | DEF-015 | 3-B-1 ✅ | [CSV_FORMAT.md](CSV_FORMAT.md) |
 | DEF-016 | 3-B-2 ✅ | [ADR-001](ADR-001-category-main-only.md) — sub 확장 Phase 5 |
 | DEF-017 | 3-C-2 ✅ | `html_renderer.py` |
@@ -352,3 +352,4 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Phase 3-B — CSV_FORMAT, ADR-001 main-only, PRD v1.1, DEF-015/016 완료 |
 | 2026-05-22 | Phase 3-C-2 — `html_renderer.py`, DEF-017 완료 |
 | 2026-05-22 | Phase 3-C-3 — `file_handler.py` 삭제, DEF-019 완료 |
+| 2026-05-22 | Phase 3-C-4 — Logger UI 토글, DEF-008 완료 |

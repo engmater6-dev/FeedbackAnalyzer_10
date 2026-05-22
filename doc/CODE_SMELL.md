@@ -36,12 +36,12 @@
 | S-A06 | B-04 | `_parse_csv_to_feedbacks` ([CSV_FORMAT](CSV_FORMAT.md)) | ✅ |
 | S-A07 | B-05 | upload 후 sent/kw | ✅ |
 | S-F04 | — | `filters` print 제거 | ✅ |
-| S-L02 | B-06 | Logger 페이지 warning/error | ✅ (토글 DEF-008) |
+| S-L02 | B-06 | Logger 페이지 warning/error/info 토글 | ✅ 3-C-4 |
 | S-T02 | — | `global_sent`/`global_kw` 클래스 변수 제거 (3-C-1) | ✅ |
 | S-A01, S-A02 | — | `HtmlRenderer` / `html_renderer.py` (3-C-2) | ✅ |
 | S-FH01, S-FH02 | — | `file_handler.py` 삭제 (3-C-3) | ✅ |
 
-**Phase 3-C 잔여:** S-T01, S-T03, S-S01~S-S02, DEF-008(토글) 등
+**Phase 3-C 잔여:** S-T01, S-T03, S-S01~S-S02, 3-C-5~7(선택) 등
 
 ---
 

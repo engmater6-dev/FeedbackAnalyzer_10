@@ -43,6 +43,7 @@ class HtmlRenderer:
         html += self._input_section()
         html += self._upload_section()
         html += self._filter_section()
+        html += self._log_settings_section()
 
         if warning:
             html += f'<p class="alert alert-warning">{escape(warning)}</p>'
@@ -79,6 +80,7 @@ class HtmlRenderer:
         .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; padding: 10px; border-radius: 4px; }
         .alert-warning { background-color: #fff3cd; border-color: #ffeaa7; color: #856404; padding: 10px; border-radius: 4px; }
         .alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; padding: 10px; border-radius: 4px; }
+        .alert-info { background-color: #d1ecf1; border-color: #bee5eb; color: #0c5460; padding: 10px; border-radius: 4px; }
         .stats { display: flex; justify-content: space-around; margin: 20px 0; }
         .stat-item { text-align: center; padding: 15px; background-color: #f8f9fa; border-radius: 5px; flex: 1; margin: 0 10px; }
         .stat-number { font-size: 24px; font-weight: bold; color: #007bff; }
@@ -179,12 +181,38 @@ class HtmlRenderer:
         html += "</div>"
         return html
 
+    def _log_settings_section(self) -> str:
+        def checked(flag: bool) -> str:
+            return " checked" if flag else ""
+
+        return f"""
+    <div class="section">
+        <h3>로그 표시 설정</h3>
+        <form action="/settings/logs" method="post">
+            <div class="form-group">
+                <label><input type="checkbox" name="show_warning" value="on"{checked(Logger.show_warning_on_page)}> Warning 페이지 표시</label>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" name="show_error" value="on"{checked(Logger.show_error_on_page)}> Error 페이지 표시</label>
+            </div>
+            <div class="form-group">
+                <label><input type="checkbox" name="show_info" value="on"{checked(Logger.show_info_on_page)}> Info 페이지 표시 (선택)</label>
+            </div>
+            <button type="submit">설정 저장</button>
+        </form>
+    </div>"""
+
     @staticmethod
     def _page_logs_section() -> str:
+        css_by_level = {
+            "warning": "alert-warning",
+            "error": "alert-danger",
+            "info": "alert-info",
+        }
         html = ""
         for entry in Logger.get_page_logs():
             level = entry["level"]
-            css = "alert-warning" if level == "warning" else "alert-danger"
+            css = css_by_level.get(level, "alert-info")
             html += (
                 f'<p class="alert {css}">{escape(entry["timestamp"])} '
                 f'[{level.upper()}] {escape(entry["message"])}</p>'

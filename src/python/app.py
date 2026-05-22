@@ -53,6 +53,21 @@ def index():
     return render_page(success="피드백 분석기 시작", feedbacks=feedbacks)
 
 
+@app.route("/settings/logs", methods=["POST"])
+def settings_logs():
+    _begin_page_request()
+    Logger.apply_display_settings(
+        show_warning=request.form.get("show_warning") == "on",
+        show_error=request.form.get("show_error") == "on",
+        show_info=request.form.get("show_info") == "on",
+    )
+    feedbacks = Session.get_current_feedbacks()
+    return render_page(
+        success="로그 표시 설정이 저장되었습니다.",
+        feedbacks=feedbacks,
+    )
+
+
 @app.route("/analyze", methods=["POST"])
 def analyze():
     _begin_page_request()
