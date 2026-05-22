@@ -108,7 +108,7 @@ src/python/
 ├── constants.py     # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS
 ├── session.py       # Session.current_feedbacks (클래스 변수)
 ├── logger.py        # print/stderr 로깅
-└── file_handler.py  # 미사용 (Lava Flow)
+└── html_renderer.py # UI (Phase 3-C-2)
 ```
 
 ### 3.3 데이터 흐름
@@ -164,7 +164,7 @@ Browser → app.py (라우트)
 | 중복 코드 | `_contains_any` in `text_analyzer`, `filters` | 공통 유틸 추출 |
 | 전역 상태 | `fil_data`, `global_sent`, `global_kw` | 세션/서비스 객체로 이전 |
 | 부적절한 네이밍 | `sent`, `kw`, `fil` | 의미 있는 이름 |
-| Lava Flow | `file_handler.py` | 제거 또는 실제 연동 |
+| Lava Flow | ~~`file_handler.py`~~ | **✅ 제거** (3-C-3) |
 | 테스트 부재 | 전체 | pytest + 90% coverage |
 | Shotgun Surgery | 키워드 3곳 이상 | constants 단일화 |
 

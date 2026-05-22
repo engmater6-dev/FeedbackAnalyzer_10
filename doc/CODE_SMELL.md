@@ -39,8 +39,9 @@
 | S-L02 | B-06 | Logger 페이지 warning/error | ✅ (토글 DEF-008) |
 | S-T02 | — | `global_sent`/`global_kw` 클래스 변수 제거 (3-C-1) | ✅ |
 | S-A01, S-A02 | — | `HtmlRenderer` / `html_renderer.py` (3-C-2) | ✅ |
+| S-FH01, S-FH02 | — | `file_handler.py` 삭제 (3-C-3) | ✅ |
 
-**Phase 3-C 잔여:** S-T01, S-T03, S-FH01, S-S01~S-S02, DEF-008 등
+**Phase 3-C 잔여:** S-T01, S-T03, S-S01~S-S02, DEF-008(토글) 등
 
 ---
 
@@ -109,12 +110,12 @@
 | S-L01 | UI와 단절된 print Logger | Med |
 | S-L02 | warning/error 미표시 (B-06) | Med | ~~B-06~~ → **✅ Green** (UI 토글 DEF-008 잔여) |
 
-### 2.8 `file_handler.py`
+### 2.8 `file_handler.py` — **제거됨 (3-C-3)**
 
-| ID | 스멜 | 심각도 |
-|----|------|--------|
-| S-FH01 | Lava Flow / Dead Code | Low |
-| S-FH02 | print만 하는 save | Low |
+| ID | 스멜 | 상태 |
+|----|------|------|
+| S-FH01 | Lava Flow / Dead Code | **✅ 삭제** — CSV 다운로드는 `app.download` + `Session` |
+| S-FH02 | print만 하는 save | **✅ 삭제** |
 
 ---
 
@@ -126,7 +127,7 @@
 | Spaghetti Code | Session + ~~fil_data~~ + ~~global_sent/kw~~ (✅) |
 | Shotgun Surgery | ~~S_KEYWORDS~~ + constants (감정 ✅, 카테고리 main SSOT) |
 | Feature Envy | filters → CATEGORY_KEYWORDS 구조 |
-| Lava Flow | file_handler.py |
+| Lava Flow | ~~file_handler.py~~ **✅ 제거** |
 
 ---
 
@@ -161,7 +162,7 @@
 3. ~~`fil_data` 제거~~ — **✅ Green**  
 4. ~~`render_page` → HtmlRenderer~~ — **✅ 3-C-2**  
 5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
-6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · `file_handler`, 네이밍 — **⏳ Phase 3-C**  
+6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · ~~`file_handler`~~ — **✅ 3-C-3** · 네이밍 — **⏳**  
 
 ---
 

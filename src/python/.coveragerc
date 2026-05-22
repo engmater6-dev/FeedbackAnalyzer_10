@@ -2,7 +2,6 @@
 branch = True
 source = text_analyzer, filters, constants, feedback, session, app, logger, html_renderer
 omit =
-    file_handler.py
     */tests/*
 
 [report]

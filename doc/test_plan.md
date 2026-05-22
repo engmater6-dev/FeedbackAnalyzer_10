@@ -3,18 +3,21 @@
 | 항목 | 내용 |
 |------|------|
 | 문서 ID | TP-01 |
-| 버전 | 1.0 |
+| 버전 | **1.1** (Phase 3-A) |
 | 작성 | 시니어 QA 리드 |
 | 일자 | 2026-05-22 |
-| 대상 브랜치 | `red` (TDD Red → Green) |
+| 대상 브랜치 | **`green`** (Green 완료) · Phase 3 Refactor: `refactor` |
+| TDD 단계 | Red ✅ → **Green ✅** → Refactor ⏳ |
+| Green Gate (2026-05-22) | **39 passed** · line cov **97.42%** · Golden Master **pass** |
 | 기술 스택 | Python 3.11+, pytest, pytest-cov, pydantic (선택·Phase 2+) |
-| 근거 문서 | [PRD.md](PRD.md), [README.md](../README.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md) |
+| 근거 문서 | [PRD.md](PRD.md), [README.md](../README.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md), [report/02.green.md](../report/02.green.md) |
 
 ---
 
 ## 1. 목적·범위
 
-본 계획서는 **선정 샘플 예제**를 중심으로 Phase 1(Red) ~ Phase 2(Green) 테스트 범위·우선순위·커버리지·측정 전략을 정의한다.
+본 계획서는 **선정 샘플 예제**를 중심으로 Phase 1(Red) ~ Phase 2(Green) 테스트 범위·우선순위·커버리지·측정 전략을 정의한다.  
+**v1.1:** Green Gate 달성 상태·명령·Mom Test §8 연동을 반영한다 (Phase 3-A).
 
 | 구분 | 포함 | 제외 (별도 계획) |
 |------|------|------------------|
@@ -26,7 +29,17 @@
 - 샘플 예제 관련 단위·통합 테스트 **Green**
 - Domain 모듈 커버리지 **≥ 95%**
 - Boundary(앱·라우트) 커버리지 **≥ 85%**
-- Mom Test §8 재검증 체크리스트 3항목 중 샘플 예제 항목 **Pass**
+- Mom Test §8 재검증 체크리스트 샘플 예제 항목 **Pass** (v1.1: 자동 4항목 완료, [MOM_TEST.md](MOM_TEST.md) §8)
+
+**Green Gate 달성 (2026-05-22 · `green`)**
+
+| 항목 | 결과 |
+|------|------|
+| 전체 테스트 | **39 passed** |
+| 커버리지 (Gate) | **97.42%** (`--cov-fail-under=90`) |
+| Domain Anchor 6 | Pass |
+| Boundary IT | Pass (`test_routes_analyze_filter`, CSV 등) |
+| Golden Master | `golden_master_expected.txt` + `test_golden_master` |
 
 ---
 
@@ -39,8 +52,9 @@
 | **연관 요구사항** | 2번(키워드 분류), 3번(감정 분류), PRD F-04/F-05/F-06, B-01/B-02 |
 | **입력** | 텍스트: `"배송이 너무 늦어요. 화가 납니다."` / 필터: 감정=`부정`, 키워드=`배송` |
 | **기대 출력** | `sent` → 부정 1, 중립 0, 긍정 0 · `kw` → 배송 1 · `filter_feedbacks(..., "부정", "배송")` → **≥ 1건**, 분석·필터 건수 일치 |
-| **현재 As-Is (Red 기준선)** | `sent` → 중립 1 · `filter` → **0건** (Mom Test §3.1, CODE_SMELL 시나리오 #1) |
-| **스멜·버그 ID** | B-01, B-02 / S-F01, S-F02, S-F03, S-T04, S-T05 |
+| **Red 기준선 (참고)** | `sent` → 중립 1 · `filter` → **0건** (Mom Test §3.1) |
+| **Green As-Is (현재)** | `sent` → 부정 1 · `filter(부정, 배송)` → **≥1건** — **Pass** |
+| **스멜·버그 ID** | B-01, B-02 — **Resolved** (Green) |
 
 ### 선택 근거 (요약)
 
@@ -57,7 +71,7 @@
 |--------|------|------|---------------|
 | **Domain** | `text_analyzer`, `filters`, `constants`, `feedback`, `session` | 비즈니스 규칙·집계·필터 | **≥ 95%** |
 | **Boundary** | `app` (라우트·CSV·렌더), `logger` | HTTP·I/O·프레젠테이션 경계 | **≥ 85%** |
-| **Dead / Deferred** | `file_handler` | Lava Flow — 삭제 전 0% 허용 또는 제거 후 제외 | — |
+| ~~**Dead**~~ | ~~`file_handler`~~ | **삭제됨** (3-C-3) — 다운로드는 `app`/`Session` | — |
 
 ### 3.2 우선순위 매트릭스
 
@@ -83,7 +97,8 @@
 | TP-ANCHOR-03 | 동일 Given | `filter_feedbacks(feedbacks, "부정", "배송")` | `len(result) >= 1`, `result[0].text`에 배송·부정 키워드 매칭 |
 | TP-ANCHOR-04 | 동일 Given | `sent` 후 `filter(부정, 전체)` | 부정 건수 == `filter` 반환 건수 |
 
-**Red 단계:** TP-ANCHOR-01, 03은 **의도적 실패**로 커밋. Green 단계(Phase 2)에서 Pass 전환.
+**Red 단계:** TP-ANCHOR-01, 03은 **의도적 실패**로 커밋 (`red` 브랜치).  
+**Green 단계:** Phase 2 완료 — TP-ANCHOR-01~04 **Pass** (2026-05-22, `green`).
 
 ### 3.4 pydantic 적용 (권장)
 
@@ -137,7 +152,7 @@ src/python/
 | **Boundary** | `app`, `logger` | **line ≥ 85%**, branch ≥ 80% | 라우트·에러 경로 IT 추가 |
 | **전체 (Gate)** | Domain + Boundary 합산 | **line ≥ 90%** (PRD R-01) | README Phase 1 DoD |
 
-`file_handler.py`: 제거 전 커버리지 집계 **제외** (`omit`).
+~~`file_handler.py`~~: 삭제 완료 (3-C-3).
 
 ### 5.2 Domain vs Boundary 산정 규칙
 
@@ -150,7 +165,7 @@ src/python/
 | 경로 | 사유 |
 |------|------|
 | `if __name__ == "__main__"` | 실행 진입점 |
-| `file_handler.py` | Lava Flow (삭제 예정) |
+| ~~`file_handler.py`~~ | 삭제됨 (3-C-3) |
 | `.venv/**` | 서드파티 |
 | `tests/**` | 자체 코드 |
 
@@ -240,7 +255,6 @@ pytest tests/domain/test_anchor_prd_example.py -m p0 -v
 branch = True
 source = text_analyzer, filters, constants, feedback, session, app, logger
 omit =
-    file_handler.py
     */tests/*
 
 [report]
@@ -257,11 +271,13 @@ directory = ../../report/coverage_html
 | 시점 | 명령 | Gate |
 |------|------|------|
 | 매 커밋 (로컬) | Domain `pytest --cov` + Anchor P0 | TP-ANCHOR-* 의도 확인 |
-| Phase 1 완료 | 전체 `--cov-fail-under=90` | README Phase 1 |
-| Phase 2 완료 | Anchor Green + Domain 95% | Mom Test §8 |
-| PR/merge | `term-missing` + html artifact | 누락 라인 리뷰 |
+| Phase 1 완료 | 전체 `--cov-fail-under=90` | README Phase 1 | ✅ **97.42%** |
+| Phase 2 완료 | Anchor Green + Domain 95% | Mom Test §8 | ✅ §8 자동 4항목 |
+| Phase 3 Refactor | 동일 Gate + Golden `--check` | [defect_list.md](defect_list.md) §6.3 | ⏳ |
+| PR/merge | `term-missing` + html artifact | 누락 라인 리뷰 | — |
 
-**Red 단계:** `--cov-fail-under`는 **비활성** 또는 `-m "not red"`로 Anchor 실패만 허용. Green 전환 시 fail-under 활성화.
+**Red 단계:** `--cov-fail-under` 비활성 또는 Anchor 실패만 허용.  
+**Green 단계:** `--cov-fail-under=90` **활성** — 현재 **통과**.
 
 ### 6.6 term-missing 해석 가이드
 
@@ -277,9 +293,9 @@ directory = ../../report/coverage_html
 
 | 단계 | 활동 | 산출 | Gate |
 |------|------|------|------|
-| **Red** | TP-ANCHOR-01~04 작성·실행 | 실패 로그·스냅샷 | 01·03 **Fail** 확인 |
-| **Green** | B-01/B-02 수정, `S_KEYWORDS` 제거, 키워드 통일 | Domain 테스트 Pass | Anchor **Pass** |
-| **Refactor** | `_contains_any` 통합, 네이밍 | 커버리지 유지 ≥95% Domain | 회귀 0 |
+| **Red** | TP-ANCHOR-01~04 작성·실행 | 실패 로그·스냅샷 | 01·03 **Fail** 확인 | ✅ `red` |
+| **Green** | B-01~B-06, `S_KEYWORDS` 제거, SSOT | **39 passed**, cov **97.42%** | Anchor **Pass** | ✅ `green` |
+| **Refactor** | `_contains_any` 통합, 네이밍, `render_page` 분리 | cov ≥90% 유지 | 회귀 0 · GM `--check` | ⏳ `refactor` |
 
 ---
 
@@ -312,6 +328,7 @@ directory = ../../report/coverage_html
 | 버전 | 일자 | 변경 |
 |------|------|------|
 | 1.0 | 2026-05-22 | 초안 — Anchor 샘플 예제 기반, Domain 95% / Boundary 85% |
+| 1.1 | 2026-05-22 | Phase 3-A — 대상 브랜치 `green`, Gate 39 passed·cov 97.42%, §2 Green As-Is, §7 TDD Green ✅ |
 
 ---
 

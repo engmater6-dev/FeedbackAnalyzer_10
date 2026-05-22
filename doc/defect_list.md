@@ -16,9 +16,9 @@
 | 구분 | 건수 |
 |------|------|
 | **전체** | 23 |
-| **완료** | 19 |
+| **완료** | 20 |
 | **부분완료** | 4 |
-| **미완료** | 1 |
+| **미완료** | 0 |
 
 | Severity | 완료 | 미완료·부분 |
 |----------|------|-------------|
@@ -60,7 +60,7 @@
 | DEF-016 | Medium | 기능결함 | Phase 3/문서 | sub-only 본문 | main-only 정책 | 0건 가능 | By design | [ADR-001](ADR-001-category-main-only.md) Won't fix v1 | **완료** |
 | DEF-017 | High | 구조/기술부채 | Phase 3 | `render_page` | 분리 | God Function | S-A01 | `html_renderer.HtmlRenderer` | **완료** |
 | DEF-018 | High | 구조/기술부채 | Phase 3 | `global_sent/kw` | 인스턴스 상태 | 클래스 변수 | S-T02 | `sent`/`kw` 반환값만 사용, 클래스 변수 제거 | **완료** |
-| DEF-019 | Medium | 구조/기술부채 | Phase 3 | `file_handler.py` | 사용/삭제 | Lava Flow | S-FH01 | 삭제 또는 연동 | **미완료** |
+| DEF-019 | Medium | 구조/기술부채 | Phase 3 | `file_handler.py` | 사용/삭제 | Lava Flow | S-FH01 | 미사용 모듈 삭제, `/download`는 Session 유지 | **완료** |
 | DEF-020 | Medium | 문서 | Phase 3/6 | MOM_TEST §7~8 | Partial Go | Fail | 미갱신 | §7.2 Partial Go, §8 자동 `[x]` (Phase 3-A) | **부분완료** — §8 인터뷰·Phase 6 최종 |
 | DEF-021 | Low | 문서 | Phase 3/6 | test_plan 메타 | `green` | `red` | 미갱신 | v1.1·Gate 39/cov 97% (Phase 3-A) | **부분완료** — Phase 6 최종 스냅샷 |
 | DEF-022 | Low | 문서 | Phase 3/6 | README 기능 문구 | 건수 요약 | 시각화 과장 | 가설 괴리 | README 문구 완화(2026-05-22) | **부분완료** |
@@ -212,7 +212,7 @@ python scripts/generate_golden_master.py --check
 |------|------|------|-----|-----------|
 | 3-C-1 | [x] | `global_sent`, `global_kw` 제거 | 018 | grep 0건·테스트 pass |
 | 3-C-2 | [x] | `render_page` → `html_renderer.HtmlRenderer` 분리 | 017 | `app.py` ~200줄 감소 |
-| 3-C-3 | [ ] | `file_handler.py` 삭제 또는 download 연동 | 019 | Lava Flow 제거 |
+| 3-C-3 | [x] | `file_handler.py` 삭제 (download는 `Session`/`app`) | 019 | Lava Flow 제거 |
 | 3-C-4 | [ ] | Logger **UI 토글** (warning/error on/off, 선택 INFO) | 008 | 페이지에서 on/off 확인 |
 | 3-C-5 | [ ] | `sent`/`kw` 네이밍 개선 (선택·회귀 주의) | S-T01 | Golden Master diff 검토 |
 | 3-C-6 | [ ] | `_contains_any` 공통 유틸 1곳 (선택) | S-T03 | 중복 제거 |
@@ -333,7 +333,7 @@ python scripts/generate_golden_master.py --check
 | DEF-016 | 3-B-2 ✅ | [ADR-001](ADR-001-category-main-only.md) — sub 확장 Phase 5 |
 | DEF-017 | 3-C-2 ✅ | `html_renderer.py` |
 | DEF-018 | 3-C-1 ✅ | global 제거 |
-| DEF-019 | 3-C-3 | file_handler 정리 |
+| DEF-019 | 3-C-3 ✅ | `file_handler.py` 삭제 |
 | DEF-020 | 3-A-1~2 ✅, 6-A-2 | Phase 6 §7·§8 최종 |
 | DEF-021 | 3-A-3 ✅, 6-A-3 | Phase 6 최종 스냅샷 |
 | DEF-022 | 6-A-4 | README (차트 선택) |
@@ -351,3 +351,4 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Phase 3-A — MOM_TEST v1.1 Partial Go, test_plan v1.1 Green Gate, DEF-020/021 부분완료 |
 | 2026-05-22 | Phase 3-B — CSV_FORMAT, ADR-001 main-only, PRD v1.1, DEF-015/016 완료 |
 | 2026-05-22 | Phase 3-C-2 — `html_renderer.py`, DEF-017 완료 |
+| 2026-05-22 | Phase 3-C-3 — `file_handler.py` 삭제, DEF-019 완료 |

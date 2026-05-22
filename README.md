@@ -123,7 +123,6 @@ FeedbackAnalyzer_10/
 │   ├── session.py             # current_feedbacks, download_feedbacks (B-03)
 │   ├── logger.py              # stdout + warning/error UI (B-06)
 │   ├── constants.py           # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS (SSOT)
-│   ├── file_handler.py        # 미사용 (Lava Flow)
 │   ├── pytest.ini
 │   ├── requirements.txt
 │   ├── requirements-dev.txt   # pytest, pytest-cov, pydantic
@@ -282,7 +281,7 @@ python scripts/generate_golden_master.py --check
 - [x] `fil_data` 제거 (B-03) / [x] `global_sent`, `global_kw` (S-T02, 3-C-1)
 - [ ] `_contains_any()` 공통 유틸 1곳 (S-T03)
 - [x] `render_page()` 분리 → `html_renderer.HtmlRenderer` (S-A01, S-A02, 3-C-2)
-- [ ] `file_handler.py` 삭제 또는 `download` 연동 (S-FH01)
+- [x] `file_handler.py` 삭제 — 다운로드는 `Session`/`app.download` (S-FH01, 3-C-3)
 - [ ] 리팩토링 1건 추가 (전략 패턴·Extract Class 등)
 - [x] README 주요 기능 문구 완화 (건수 통계·규칙 기반 명시) / [ ] 차트 등 시각화 추가는 선택
 
@@ -317,6 +316,6 @@ python scripts/generate_golden_master.py --check
 | 다운로드 빈/불일치 | S-A03 | ✅ B-03 | app, session |
 | CSV text 무시 | S-A06 | ✅ B-04 | app |
 | 로그 UI 없음 | S-L02 | ✅ B-06 | logger, app |
-| God Function / 죽은 코드 | S-A01, S-FH01 | ⏳ Phase 3 | app, file_handler |
+| God Function / 죽은 코드 | S-A01, S-FH01 | ✅ Phase 3 | `html_renderer`, Lava Flow 제거 |
 
 상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4 · QA: [doc/defect_list.md](doc/defect_list.md)
