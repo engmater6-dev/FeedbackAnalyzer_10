@@ -74,7 +74,7 @@ matches_category(text, category) :=
 2. `matches_category` 변경 + Domain·Golden Master `--force` 갱신
 3. [defect_list.md](defect_list.md) DEF-016 **완료** 또는 **Won't fix** 명시
 
-**현재:** sub 확장 **No-Go** — 문서화로 DEF-016 **완료** 처리.
+**현재 (Phase 5 · `new_feature`):** sub 확장 **No-Go** — 문서화로 DEF-016 **완료** 처리. Trend·감정 DB는 별도(R-09/R-10).
 
 ---
 

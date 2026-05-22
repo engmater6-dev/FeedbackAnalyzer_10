@@ -11,9 +11,10 @@
 > - 코드 스멜 분석: [doc/CODE_SMELL.md](doc/CODE_SMELL.md)  
 > - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)  
 > - QA 결함 목록: [doc/defect_list.md](doc/defect_list.md)  
-> - CSV 규격 · 카테고리 정책: [doc/CSV_FORMAT.md](doc/CSV_FORMAT.md), [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)
+> - CSV 규격 · 카테고리 정책: [doc/CSV_FORMAT.md](doc/CSV_FORMAT.md), [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)  
+> - 감정 키워드 DB: [doc/KEYWORD_DB.md](doc/KEYWORD_DB.md)
 
-> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). 화면에는 **건수 통계 요약** 위주이며, 고급 시각화·검색은 [Mom Test](doc/MOM_TEST.md) 기준 제한적입니다.
+> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). **건수 통계** + `date,text` CSV 업로드 시 **월별 추이(Trend)**. 감정 키워드는 SQLite DB에서 CRUD ([Mom Test](doc/MOM_TEST.md) 실무 검증은 Phase 6).
 
 ## 주요 기능
 
@@ -22,6 +23,8 @@
 - 감정 분류 (긍정/부정/중립, 키워드 매칭)
 - 피드백 필터링 (감정·카테고리 드롭다운)
 - 분석 결과 요약 (감정·카테고리 **건수 통계**)
+- **월별 추이(Trend)** — `date,text` CSV 업로드 시 감정·키워드 막대 차트
+- **감정 키워드 DB** — SQLite 저장·`POST /settings/keywords` CRUD
 - 결과 CSV 다운로드 (마지막 입력·필터 결과, `Session.download_feedbacks`)
 
 ## 요구사항
@@ -113,15 +116,17 @@ FeedbackAnalyzer_10/
 │   ├── test_plan.md           # 테스트 계획서 (v1.1)
 │   ├── CSV_FORMAT.md          # CSV 업로드 규격 (3-B)
 │   ├── ADR-001-category-main-only.md  # 카테고리 main-only 정책
+│   ├── KEYWORD_DB.md          # SQLite 감정 키워드 (Phase 5, R-10)
 │   └── defect_list.md         # QA 결함 23건 (완료 21 · 부분 3)
-├── report/                    # Red/Green/Refactor/Feature (01.red, 02.green, 03.refactor, 04.feature)
+├── report/                    # 01.red ~ 05.phase5_* (trend, keyword_db)
 ├── prompt/                    # 단계별 프롬프트·축약 답변 (04.feature 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
 │   ├── app.py                 # Flask 부트스트랩·Blueprint 등록
-│   ├── handlers/              # HTTP Blueprint (analyze, upload, filter, …)
-│   ├── services/              # csv_parser, sentiment, category, analysis, filter
-│   ├── models/                # Feedback, Session (인스턴스 + get_session)
+│   ├── handlers/              # analyze, upload, filter, download, settings, keywords
+│   ├── services/              # csv/trend parser, sentiment, category, keyword_db, trend
+│   ├── data/                  # sentiment_keywords.db (git 제외, 런타임 생성)
+│   ├── models/                # Feedback(+recorded_at), Session
 │   ├── html_renderer.py       # HtmlRenderer — 대시보드 HTML (3-C-2)
 │   ├── feedback.py            # 셔임 → models.feedback
 │   ├── session.py             # 셔임 → models.session
@@ -130,7 +135,7 @@ FeedbackAnalyzer_10/
 │   ├── text_utils.py          # contains_any() (3-C-6)
 │   ├── analysis_strategies.py # 셔임 → services.sentiment/category
 │   ├── logger.py              # stdout + level별 페이지 토글 (B-06, 3-C-4)
-│   ├── constants.py           # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS (SSOT)
+│   ├── constants.py           # CATEGORY SSOT · SENTIMENT 시드(→ SQLite)
 │   ├── pytest.ini
 │   ├── requirements.txt
 │   ├── requirements-dev.txt   # pytest, pytest-cov, pydantic
@@ -145,7 +150,7 @@ FeedbackAnalyzer_10/
 │       │   ├── test_anchor_prd_example.py
 │       │   ├── test_filters_regression.py
 │       │   └── test_golden_master.py
-│       └── boundary/            # IT-01~04 (Flask test_client)
+│       └── boundary/            # IT-01~04 + trend/keyword upload
 ├── project_purpose.md         # 8단계 미션
 └── README.md
 ```
@@ -153,9 +158,9 @@ FeedbackAnalyzer_10/
 ## 사용 방법
 
 1. `http://localhost:8080` 접속
-2. 피드백 텍스트 입력 또는 CSV 업로드
-3. 감정/키워드 필터로 「분석」 실행
-4. 필요 시 「결과 다운로드」— 마지막 입력·필터 결과 (`Session.download_feedbacks`)
+2. 피드백 텍스트 입력 또는 CSV 업로드 (`text` 또는 Trend용 `date,text` — [sample/test_feedback_trend.csv](sample/test_feedback_trend.csv))
+3. 감정/키워드 필터로 「분석」 실행 · (선택) 대시보드에서 **감정 키워드** 추가/삭제
+4. **월별 추이**·건수 통계 확인 후 필요 시 「결과 다운로드」
 
 ## CSV 파일 형식
 
@@ -181,7 +186,7 @@ FeedbackAnalyzer_10/
 
 [project_purpose.md](project_purpose.md) 8단계 미션 + [CODE_SMELL.md](doc/CODE_SMELL.md) 스멜 ID를 매핑한 체크리스트입니다. **TDD: Red → Green → Refactor** 순서를 권장합니다.
 
-### 진행 현황 (2026-05-22 · 브랜치 **`feature/phase-4-structure`**)
+### 진행 현황 (2026-05-22 · 브랜치 **`new_feature`**)
 
 | Phase | 상태 | 비고 |
 |-------|------|------|
@@ -190,12 +195,13 @@ FeedbackAnalyzer_10/
 | Phase 2 | **완료** (`green`) | B-01~B-06 · [report/02.green.md](report/02.green.md) |
 | Phase 3 | **완료** (`refactor`) | 3-A~B 문서 · **3-C-1~7** · **3-D Gate** |
 | Phase 4 | **완료** | R-07·R-08 · [report/04.feature.md](report/04.feature.md) · **4-D Gate** |
-| Phase 5~6 | **미착수** | Trend·DB · 팀 리뷰·발표 |
+| Phase 5 | **완료** | R-09 Trend · R-10 SQLite 키워드 · [report/05.phase5_trend.md](report/05.phase5_trend.md) · [report/05.phase5_keyword_db.md](report/05.phase5_keyword_db.md) |
+| Phase 6 | **미착수** | 팀 리뷰 · DEF-020~022 종결 · 발표 |
 
-| 지표 (Phase 4 Gate) | 수치 |
-|------------------------|------|
-| pytest | **55 passed** |
-| 커버리지 | **97.57%** |
+| 지표 (Phase 5 Gate · `new_feature`) | 수치 |
+|--------------------------------------|------|
+| pytest | **79 passed** |
+| 커버리지 | **94.15%** |
 | Golden Master | **pass** (`--check`) |
 | QA 결함 | 완료 **21** · 부분 **3** (DEF-020~022) · 미완료 **0** ([defect_list.md](doc/defect_list.md)) |
 
@@ -218,6 +224,8 @@ python scripts/generate_golden_master.py --check
 **Refactor 커밋 (`refactor`):** `CSV 규칙·main-only 정책 문서` → `global_sent, global_kw 제거` → `render_page 분리` → `file_handler 제거` → `Logger UI 토글` → `contains_any 공통 유틸` → `분석 전략 패턴 적용` → `sent/kw 네이밍 개선`
 
 **Phase 4 커밋 (`feature/phase-4-structure`):** `handlers/services/models 분리` → `sentiment/category 서비스` → `Feedback setter` → `Session 인스턴스` → Gate
+
+**Phase 5 커밋 (`new_feature`):** `test_feedback_trend.csv 샘플 추가 (R-09)` → `Trend 시각화` → `SQLite 감정 키워드 DB`
 
 ---
 
@@ -317,7 +325,7 @@ python scripts/generate_golden_master.py --check
 - [x] `pytest tests/ --cov --cov-fail-under=90` — **50 passed**, cov **97.78%**
 - [x] `python scripts/generate_golden_master.py --check` OK
 
-- [x] README 주요 기능 문구 완화 / [ ] 차트·Trend는 Phase 5 선택
+- [x] README 주요 기능 문구 완화 / [x] Trend·키워드 DB (Phase 5)
 
 ### Phase 4 — 구조·모델 ✅
 
@@ -337,6 +345,11 @@ python scripts/generate_golden_master.py --check
 - [x] 감정 키워드 File DB (SQLite) — `constants` 시드, 런타임 DB SSOT ([doc/KEYWORD_DB.md](doc/KEYWORD_DB.md))
 - [x] DB ↔ analyzer ↔ filter 연동 — `classify_sentiment` 단일 경로 ([report/05.phase5_keyword_db.md](report/05.phase5_keyword_db.md))
 
+#### 5-D · Gate
+- [x] `pytest tests/ --cov --cov-fail-under=90` — **79 passed**, cov **94.15%**
+- [x] `python scripts/generate_golden_master.py --check` OK
+- [x] DEF-016 — [ADR-001](doc/ADR-001-category-main-only.md) **main-only 유지** (sub 확장 No-Go)
+
 ### Phase 6 — 리뷰·발표 (약 2시간)
 
 - [ ] `report/`에 팀 리뷰·장단점 (스멜 개선 전/후)
@@ -355,5 +368,6 @@ python scripts/generate_golden_master.py --check
 | CSV text 무시 | S-A06 | ✅ B-04 | app |
 | 로그 UI·토글 | S-L02 | ✅ B-06, 3-C-4 | logger, `/settings/logs` |
 | God Function / 죽은 코드 | S-A01, S-FH01 | ✅ Phase 3 | `html_renderer`, Lava Flow 제거 |
+| 감정 키워드 하드코딩 | S-C01, S-C02 | ✅ Phase 5 | `keyword_db`, `classify_sentiment` |
 
 상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4 · QA: [doc/defect_list.md](doc/defect_list.md)

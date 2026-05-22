@@ -120,9 +120,9 @@
 
 | “좋아 보이는” 요소 | 실제 증거 |
 |-------------------|-----------|
-| Trend 시각화 (Phase 5) | `sample/test_feedback_trend.csv` **없음** — 니즈 검증 전 구현 예정 |
+| Trend 시각화 (Phase 5) | ✅ `sample/test_feedback_trend.csv` · 월별 막대 UI — **1차 스크리닝 보조** 수준 |
 | 90% 테스트 커버리지 | **학습 성공 지표**이지 고객 가치 지표는 아님 |
-| File DB 키워드 CRUD | 운영 담당자 인터뷰 없이 **가설 기능** |
+| File DB 키워드 CRUD | ✅ SQLite·CRUD 구현 — 운영 거버넌스·인터뷰 검증은 Phase 6 선택 |
 
 ### 4.4 “돈·시간·평판이 걸린 문제인가?”
 

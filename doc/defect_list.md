@@ -5,7 +5,7 @@
 | 문서 ID | QA-DEF-01 |
 | 작성 | QA 리드 |
 | 일자 | 2026-05-22 |
-| 대상 브랜치 | **`feature/phase-4-structure`** (Phase 3 `refactor` + Phase 4 구조) |
+| 대상 브랜치 | **`new_feature`** (Phase 4 구조 + Phase 5 Trend·SQLite 키워드 DB) |
 | 근거 | Red · Green · Refactor · QA 분석(`doc/`, `README.md`, `src/`) |
 | 관련 | [PRD.md](PRD.md) §4, [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
 
@@ -32,10 +32,10 @@
 | TDD Green (`green`) | ✅ B-01~B-06, Step 0~7, Golden Master |
 | Phase 3 Refactor (`refactor`) | ✅ 3-A~3-D (3-C-1~7, Gate **50 passed**) |
 | Phase 4 구조 (`feature/phase-4-structure`) | ✅ 4-1~4-5 · Gate **55 passed** |
-| Phase 5 (선택) | ⏳ Trend·DB |
+| Phase 5 확장 (`new_feature`) | ✅ 5-2~5-4 Trend·SQLite · Gate **79 passed** |
 | Phase 6 QA 종결 | ⏳ §6.6 Gate (DEF-020~022 문서·발표) |
 
-> **최종 갱신 (2026-05-22 · `feature/phase-4-structure`):** pytest **55 passed** · cov **97.57%** · Golden Master **OK** · Phase 4 R-07/R-08 완료 · 문서 DEF **020~022 부분완료**
+> **최종 갱신 (2026-05-22 · `new_feature`):** pytest **79 passed** · cov **94.15%** · Golden Master **OK** · Phase 5 R-09/R-10 완료 · DEF-016 main-only 문서 확정 · DEF **020~022 부분완료**
 
 ---
 
@@ -122,9 +122,9 @@ Phase 1~2 ✅ (`green` · B-01~06 · Golden Master)
     ↓
 Phase 3 ✅ (`refactor` · 3-A~D · 50 passed)
     ↓
-Phase 4 [ ] (선택) 구조·모델
+Phase 4 ✅ 구조·모델 (R-07/R-08)
     ↓
-Phase 5 [ ] (선택) Trend·DB
+Phase 5 ✅ Trend·SQLite 키워드 DB
     ↓
 Phase 6 [ ] 리뷰·문서·발표  ← DEF-020~022 최종
 ```
@@ -134,8 +134,8 @@ Phase 6 [ ] 리뷰·문서·발표  ← DEF-020~022 최종
 | 0 | 0.5h | 수동 E2E | 브라우저 5시나리오 |
 | 1~2 | ✅ | Green | 39→50 tests, cov ≥90% |
 | **3** | **✅** | **008~019, 015~016 문서, 3-C-1~7** | **50 passed, cov 97.78%, GM OK** |
-| 4 | 선택 | R-07 | handlers/services 분리 |
-| 5 | 3h | Trend·DB | ADR-001 재검토 |
+| 4 | ✅ | R-07/R-08 | handlers/services/models |
+| 5 | ✅ | R-09/R-10 | Trend CSV·UI·keyword_db |
 | **6** | **2h** | **020~022, report, 발표** | **실습 종결 Gate** |
 
 ---
@@ -255,11 +255,11 @@ python scripts/generate_golden_master.py --check
 
 | 순서 | 체크 | 작업 | DEF | 비고 |
 |------|------|------|-----|------|
-| 5-1 | [ ] | Mom Test 인터뷰 3명(선택) → Trend Go/No-Go | §8-5 | No-Go면 5-2~5-4 skip 가능 |
+| 5-1 | [x] | Mom Test 인터뷰 3명(선택) → Trend Go/No-Go | §8-5 | 교육 범위: 구현 Go(샘플·UI 완료), 인터뷰 노트 Phase 6 선택 |
 | 5-2 | [x] | `sample/test_feedback_trend.csv` 추가 | — | |
 | 5-3 | [x] | Trend 시각화 UI | — | `trend_service`, HtmlRenderer |
 | 5-4 | [x] | SQLite 감정 키워드 DB | — | keyword_db, CRUD UI |
-| 5-5 | [ ] | **DEF-016:** sub 키워드 매칭 확장 시 analyzer·filter·**Golden Master `--force`** | 016 | 정책이 main-only 유지면 5-5 = 문서만 완료 |
+| 5-5 | [x] | **DEF-016:** sub 키워드 — **main-only 유지** (ADR-001 No-Go, GM 변경 없음) | 016 | 문서·정책 완료 |
 
 **Phase 5 Gate:** 5-1 결정서 + (Go 시) 5-2~5-4 또는 (No-Go 시) DEF-016 문서 **완료** 처리
 

@@ -3,12 +3,12 @@
 | 항목 | 내용 |
 |------|------|
 | 문서 ID | TP-01 |
-| 버전 | **1.1** (Phase 3-A) |
+| 버전 | **1.2** (Phase 5) |
 | 작성 | 시니어 QA 리드 |
 | 일자 | 2026-05-22 |
-| 대상 브랜치 | **`green`** (Green 완료) · Phase 3 Refactor: `refactor` |
-| TDD 단계 | Red ✅ → **Green ✅** → Refactor ⏳ |
-| Green Gate (2026-05-22) | **39 passed** · line cov **97.42%** · Golden Master **pass** |
+| 대상 브랜치 | **`new_feature`** (Green·Refactor·Phase 4·5 완료) |
+| TDD 단계 | Red ✅ → Green ✅ → Refactor ✅ → Phase 5 ✅ |
+| Phase 5 Gate (2026-05-22) | **79 passed** · line cov **94.15%** · Golden Master **pass** |
 | 기술 스택 | Python 3.11+, pytest, pytest-cov, pydantic (선택·Phase 2+) |
 | 근거 문서 | [PRD.md](PRD.md), [README.md](../README.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md), [report/02.green.md](../report/02.green.md) |
 
@@ -21,7 +21,7 @@
 
 | 구분 | 포함 | 제외 (별도 계획) |
 |------|------|------------------|
-| In-Scope | 감정·카테고리 분석, `filter_feedbacks`, 세션·모델, Flask 핵심 라우트 | Trend 시각화, File DB CRUD (Phase 5) |
+| In-Scope | 감정·카테고리 분석, `filter_feedbacks`, 세션·모델, Flask 라우트, **Trend CSV·UI**, **SQLite 감정 키워드 CRUD** | E2E 브라우저(Phase 0), 부하·보안 |
 | Out-of-Scope (초기) | E2E 브라우저, 부하·보안, ML/NLP | — |
 
 **완료 정의 (DoD)**
@@ -329,6 +329,7 @@ directory = ../../report/coverage_html
 |------|------|------|
 | 1.0 | 2026-05-22 | 초안 — Anchor 샘플 예제 기반, Domain 95% / Boundary 85% |
 | 1.1 | 2026-05-22 | Phase 3-A — 대상 브랜치 `green`, Gate 39 passed·cov 97.42%, §2 Green As-Is, §7 TDD Green ✅ |
+| 1.2 | 2026-05-22 | Phase 5 — `new_feature`, Gate **79 passed**·cov **94.15%**, Trend·keyword_db In-Scope |
 
 ---
 

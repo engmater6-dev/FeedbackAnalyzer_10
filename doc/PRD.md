@@ -2,8 +2,8 @@
 
 | 항목 | 내용 |
 |------|------|
-| 문서 버전 | 1.1 |
-| 최종 수정 | 2026-05-22 |
+| 문서 버전 | 1.2 |
+| 최종 수정 | 2026-05-22 (Phase 5 `new_feature`) |
 | 프로젝트명 | 리팩토링 챌린지: 고객 피드백 분석 시스템 |
 | 관련 문서 | [README.md](../README.md), [project_purpose.md](../project_purpose.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md) |
 
@@ -45,6 +45,8 @@
 | F-05 | 카테고리 분류 | 배송·품질·가격·서비스·사용성 | `POST /analyze`, `POST /filter` |
 | F-06 | 필터링 | 감정·카테고리 조건 필터 | `POST /filter` |
 | F-07 | 결과 시각화 | 감정·키워드 분포 숫자 표시 | HTML stats 영역 |
+| F-09 | Trend 추이 | `date,text` CSV 월별 감정·키워드 막대 | `POST /upload` + HTML Trend 섹션 |
+| F-10 | 감정 키워드 DB | SQLite CRUD·분류 SSOT | `POST /settings/keywords` · `keyword_db` |
 | F-08 | CSV 다운로드 | 필터 결과보내기 | `GET /download` |
 
 ### 2.2 사용자 시나리오
