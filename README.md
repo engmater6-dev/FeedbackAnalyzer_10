@@ -114,7 +114,8 @@ FeedbackAnalyzer_10/
 │   ├── CSV_FORMAT.md          # CSV 업로드 규격 (3-B)
 │   ├── ADR-001-category-main-only.md  # 카테고리 main-only 정책
 │   └── defect_list.md         # QA 결함 23건 (완료 21 · 부분 3)
-├── report/                    # Red/Green 산출물 (green_step0~6, 01.red 등)
+├── report/                    # Red/Green/Refactor/Feature (01.red, 02.green, 03.refactor, 04.feature)
+├── prompt/                    # 단계별 프롬프트·축약 답변 (04.feature 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
 │   ├── app.py                 # Flask 부트스트랩·Blueprint 등록
@@ -188,7 +189,7 @@ FeedbackAnalyzer_10/
 | Phase 1 | **완료** (`green`) | pytest · cov 90%+ · Golden Master |
 | Phase 2 | **완료** (`green`) | B-01~B-06 · [report/02.green.md](report/02.green.md) |
 | Phase 3 | **완료** (`refactor`) | 3-A~B 문서 · **3-C-1~7** · **3-D Gate** |
-| Phase 4 | **완료** | R-07·R-08 · handlers/services/models · **4-D Gate** |
+| Phase 4 | **완료** | R-07·R-08 · [report/04.feature.md](report/04.feature.md) · **4-D Gate** |
 | Phase 5~6 | **미착수** | Trend·DB · 팀 리뷰·발표 |
 
 | 지표 (Phase 4 Gate) | 수치 |
