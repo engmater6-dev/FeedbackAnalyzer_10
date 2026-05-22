@@ -22,9 +22,6 @@ def matches_category(text: str, category: str) -> bool:
 
 
 class TextAnalyzer:
-    global_sent: Dict[str, int] = {}
-    global_kw: Dict[str, int] = {}
-
     @staticmethod
     def _contains_any(text: str, keywords: List[str]) -> bool:
         return any(kw in text for kw in keywords)
@@ -35,7 +32,6 @@ class TextAnalyzer:
         for f in feedbacks:
             res[classify_sentiment(f.text)] += 1
 
-        TextAnalyzer.global_sent = res
         return res
 
     def kw(self, feedbacks: List[Feedback]) -> Dict[str, int]:
@@ -46,5 +42,4 @@ class TextAnalyzer:
                 if matches_category(f.text, cat):
                     res[cat] += 1
 
-        TextAnalyzer.global_kw = res
         return res

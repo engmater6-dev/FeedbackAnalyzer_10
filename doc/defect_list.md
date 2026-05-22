@@ -16,9 +16,9 @@
 | 구분 | 건수 |
 |------|------|
 | **전체** | 23 |
-| **완료** | 17 |
+| **완료** | 18 |
 | **부분완료** | 4 |
-| **미완료** | 3 |
+| **미완료** | 2 |
 
 | Severity | 완료 | 미완료·부분 |
 |----------|------|-------------|
@@ -59,7 +59,7 @@
 | DEF-015 | Medium | 기능결함 | Phase 3/문서 | CSV 헤더 없음 0열 | 명시적 규칙 | 레거시 0열 | 휴리스틱 없음 | [CSV_FORMAT.md](CSV_FORMAT.md) §2 | **완료** |
 | DEF-016 | Medium | 기능결함 | Phase 3/문서 | sub-only 본문 | main-only 정책 | 0건 가능 | By design | [ADR-001](ADR-001-category-main-only.md) Won't fix v1 | **완료** |
 | DEF-017 | High | 구조/기술부채 | Phase 3 | `render_page` | 분리 | God Function | S-A01 | 템플릿 분리 | **미완료** |
-| DEF-018 | High | 구조/기술부채 | Phase 3 | `global_sent/kw` | 인스턴스 상태 | 클래스 변수 | S-T02 | DTO·전역 제거 | **미완료** |
+| DEF-018 | High | 구조/기술부채 | Phase 3 | `global_sent/kw` | 인스턴스 상태 | 클래스 변수 | S-T02 | `sent`/`kw` 반환값만 사용, 클래스 변수 제거 | **완료** |
 | DEF-019 | Medium | 구조/기술부채 | Phase 3 | `file_handler.py` | 사용/삭제 | Lava Flow | S-FH01 | 삭제 또는 연동 | **미완료** |
 | DEF-020 | Medium | 문서 | Phase 3/6 | MOM_TEST §7~8 | Partial Go | Fail | 미갱신 | §7.2 Partial Go, §8 자동 `[x]` (Phase 3-A) | **부분완료** — §8 인터뷰·Phase 6 최종 |
 | DEF-021 | Low | 문서 | Phase 3/6 | test_plan 메타 | `green` | `red` | 미갱신 | v1.1·Gate 39/cov 97% (Phase 3-A) | **부분완료** — Phase 6 최종 스냅샷 |
@@ -210,7 +210,7 @@ python scripts/generate_golden_master.py --check
 
 | 순서 | 체크 | 작업 | DEF | 완료 기준 |
 |------|------|------|-----|-----------|
-| 3-C-1 | [ ] | `global_sent`, `global_kw` 제거 | 018 | grep 0건·테스트 pass |
+| 3-C-1 | [x] | `global_sent`, `global_kw` 제거 | 018 | grep 0건·테스트 pass |
 | 3-C-2 | [ ] | `render_page` → 템플릿 또는 `HtmlRenderer` 분리 | 017 | `app.py` 라인 수 감소 |
 | 3-C-3 | [ ] | `file_handler.py` 삭제 또는 download 연동 | 019 | Lava Flow 제거 |
 | 3-C-4 | [ ] | Logger **UI 토글** (warning/error on/off, 선택 INFO) | 008 | 페이지에서 on/off 확인 |
@@ -332,7 +332,7 @@ python scripts/generate_golden_master.py --check
 | DEF-015 | 3-B-1 ✅ | [CSV_FORMAT.md](CSV_FORMAT.md) |
 | DEF-016 | 3-B-2 ✅ | [ADR-001](ADR-001-category-main-only.md) — sub 확장 Phase 5 |
 | DEF-017 | 3-C-2 | render 분리 |
-| DEF-018 | 3-C-1 | global 제거 |
+| DEF-018 | 3-C-1 ✅ | global 제거 |
 | DEF-019 | 3-C-3 | file_handler 정리 |
 | DEF-020 | 3-A-1~2 ✅, 6-A-2 | Phase 6 §7·§8 최종 |
 | DEF-021 | 3-A-3 ✅, 6-A-3 | Phase 6 최종 스냅샷 |

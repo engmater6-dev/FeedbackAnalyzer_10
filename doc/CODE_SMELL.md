@@ -37,6 +37,7 @@
 | S-A07 | B-05 | upload 후 sent/kw | ✅ |
 | S-F04 | — | `filters` print 제거 | ✅ |
 | S-L02 | B-06 | Logger 페이지 warning/error | ✅ (토글 DEF-008) |
+| S-T02 | — | `global_sent`/`global_kw` 클래스 변수 제거 (3-C-1) | ✅ |
 
 **Phase 3-C 잔여:** S-A01, S-A02, S-T01, S-T02, S-T03, S-FH01, S-S01~S-S02 등
 
@@ -61,7 +62,7 @@
 | ID | 스멜 | 심각도 | 위치·설명 |
 |----|------|--------|-----------|
 | S-T01 | 부적절한 네이밍 | Med | `sent`, `kw` |
-| S-T02 | 클래스 변수 부작용 | High | `global_sent`, `global_kw` |
+| S-T02 | 클래스 변수 부작용 | High | ~~`global_sent`, `global_kw`~~ → **✅ 3-C-1** 제거 |
 | S-T03 | 중복 `_contains_any` | High | `filters.py`와 동일 |
 | S-T04 | 불완전한 감정 규칙 | High | ~~B-01~~ → **✅ Green** `classify_sentiment()` |
 | S-T05 | `kw()` main만 매칭 | High | ~~B-02~~ → **✅ Green** `matches_category()` ([ADR-001](ADR-001-category-main-only.md)) |
@@ -121,7 +122,7 @@
 | 안티패턴 | 코드 |
 |----------|------|
 | God Function | `app.render_page` |
-| Spaghetti Code | Session + ~~fil_data~~ + global_sent/kw (fil_data ✅) |
+| Spaghetti Code | Session + ~~fil_data~~ + ~~global_sent/kw~~ (✅) |
 | Shotgun Surgery | ~~S_KEYWORDS~~ + constants (감정 ✅, 카테고리 main SSOT) |
 | Feature Envy | filters → CATEGORY_KEYWORDS 구조 |
 | Lava Flow | file_handler.py |
@@ -159,7 +160,7 @@
 3. ~~`fil_data` 제거~~ — **✅ Green**  
 4. `render_page` → 템플릿/HtmlRenderer — **⏳ Phase 3-C**  
 5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
-6. `global_sent/kw`, `file_handler`, 네이밍 — **⏳ Phase 3-C**  
+6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · `file_handler`, 네이밍 — **⏳ Phase 3-C**  
 
 ---
 

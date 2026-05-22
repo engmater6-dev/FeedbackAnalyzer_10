@@ -278,7 +278,7 @@ python scripts/generate_golden_master.py --check
 ### Phase 3 — 코드 품질·스멜 제거 (약 2.5시간)
 
 - [ ] 네이밍: `sent`→`analyze_sentiment`, `kw`→`analyze_keywords` (S-T01)
-- [x] `fil_data` 제거 (B-03) / [ ] `global_sent`, `global_kw` (S-T02)
+- [x] `fil_data` 제거 (B-03) / [x] `global_sent`, `global_kw` (S-T02, 3-C-1)
 - [ ] `_contains_any()` 공통 유틸 1곳 (S-T03)
 - [ ] `render_page()` 분리 → 템플릿/`HtmlRenderer` (S-A01, S-A02)
 - [ ] `file_handler.py` 삭제 또는 `download` 연동 (S-FH01)
