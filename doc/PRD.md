@@ -2,7 +2,7 @@
 
 | 항목 | 내용 |
 |------|------|
-| 문서 버전 | 1.0 |
+| 문서 버전 | 1.1 |
 | 최종 수정 | 2026-05-22 |
 | 프로젝트명 | 리팩토링 챌린지: 고객 피드백 분석 시스템 |
 | 관련 문서 | [README.md](../README.md), [project_purpose.md](../project_purpose.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md) |
@@ -64,6 +64,29 @@
 | 키워드 필터 | 감정=`중립`, 키워드=`배송` | 조건 일치 피드백 목록·집계 |
 | 다운로드 | (필터 성공 후) | `filtered_feedback.csv` |
 
+### 2.4 CSV 업로드 규격 (Phase 3-B)
+
+상세: [CSV_FORMAT.md](CSV_FORMAT.md)
+
+| 모드 | 조건 | 파싱 |
+|------|------|------|
+| **표준 (권장)** | 1행 헤더에 `text` | 2행부터 `text` 열, 빈 셀 제외 |
+| **레거시** | `text` 헤더 없음 | **0번 열**, **1행부터** 전부 데이터 (헤더 스킵 없음) |
+
+- 인코딩: UTF-8 / BOM 허용  
+- B-04 **Resolved** (`_parse_csv_to_feedbacks`)
+
+### 2.5 카테고리 매칭 정책 (Phase 3-B)
+
+상세: [ADR-001-category-main-only.md](ADR-001-category-main-only.md)
+
+| 항목 | 정책 |
+|------|------|
+| 매칭 범위 | `CATEGORY_KEYWORDS[cat]["main"]` substring만 |
+| `sub` 맵 | 분류 메타·향후 확장용, **런타임 미사용** |
+| `kw()` vs `filter` | `matches_category()` 단일 SSOT (B-02) |
+| sub 확장 | Phase 5 인터뷰 **Go** 전까지 **No-Go** (DEF-016 문서 완료) |
+
 ---
 
 ## 3. 기술 아키텍처 (As-Is)
@@ -81,7 +104,7 @@ src/python/
 ├── app.py           # Flask, 라우팅, render_page (God Function)
 ├── feedback.py      # Feedback 모델
 ├── text_analyzer.py # sent(), kw() — 감정·카테고리 집계
-├── filters.py       # filter_feedbacks() — S_KEYWORDS 별도 정의
+├── filters.py       # filter_feedbacks() — classify_sentiment / matches_category 공유
 ├── constants.py     # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS
 ├── session.py       # Session.current_feedbacks (클래스 변수)
 ├── logger.py        # print/stderr 로깅
@@ -94,7 +117,7 @@ src/python/
 Browser → app.py (라우트)
        → Session.current_feedbacks (피드백 저장)
        → TextAnalyzer.sent/kw (집계)
-       → filter_feedbacks (필터) → fil_data (전역, 다운로드용)
+       → filter_feedbacks (필터) → Session.download_feedbacks
        → Logger (터미널만)
 ```
 
@@ -102,14 +125,34 @@ Browser → app.py (라우트)
 
 ## 4. 알려진 문제 (버그·불일치)
 
-| ID | 심각도 | 문제 | 원인 | 수정 방향 |
-|----|--------|------|------|-----------|
-| B-01 | High | **중립 필터** 결과가 분석과 불일치 | `constants.SENTIMENT_KEYWORDS`에 중립 없음 vs `filters.S_KEYWORDS` 중립 키워드 존재 | 감정 분류·필터가 동일 규칙·동일 키워드 소스 사용 |
-| B-02 | High | **카테고리 필터**가 `main` 키워드 미매칭 | `filter_feedbacks`가 `sub_key=="main"` 스킵, `kw()`는 `main`만 사용 | 카테고리 매칭 로직 통일 |
-| B-03 | Medium | 다운로드가 빈/구버전 데이터 | `fil_data`는 `/filter` 성공 시만 갱신 | analyze/upload 후에도 일관된 다운로드 대상 |
-| B-04 | Medium | CSV `text` 컬럼 미준수 | 업로드가 0번 컬럼·첫 행 무조건 스킵 | 헤더 검증·`text` 컬럼 파싱 |
-| B-05 | Low | 업로드 후 자동 분석 없음 | `/upload`가 집계 미호출 | 업로드 직후 분석 옵션 또는 명시 UX |
-| B-06 | Low | 로그가 UI에 미표시 | Logger → stdout만 | level별 페이지 표시 (warning, error) |
+### 4.1 Green에서 해결됨 (`green` · 2026-05-22)
+
+| ID | 상태 | 수정 요약 |
+|----|------|-----------|
+| B-01 | **Resolved** | `classify_sentiment()` SSOT, `S_KEYWORDS` 제거 |
+| B-02 | **Resolved** | `matches_category()` — main-only ([ADR-001](ADR-001-category-main-only.md)) |
+| B-03 | **Resolved** | `Session.download_feedbacks`, `fil_data` 제거 |
+| B-04 | **Resolved** | [CSV_FORMAT.md](CSV_FORMAT.md), `_parse_csv_to_feedbacks` |
+| B-05 | **Resolved** | upload 직후 `sent`/`kw` |
+| B-06 | **Resolved** (부분) | warning/error UI — level 토글은 Phase 3-C (DEF-008) |
+
+### 4.2 잔여·정책 (문서화 완료)
+
+| ID | 유형 | 내용 | 처리 |
+|----|------|------|------|
+| — | CSV 레거시 | 헤더 없을 때 1행=데이터 | [CSV_FORMAT.md](CSV_FORMAT.md) §2 — **By design** |
+| — | 카테고리 | sub 키워드 미매칭 | [ADR-001](ADR-001-category-main-only.md) — **Won't fix (v1)** |
+
+### 4.3 Red 기준선 (참고)
+
+| ID | Red 시 문제 | Green |
+|----|-------------|-------|
+| B-01 | 중립 필터 불일치 | ✅ |
+| B-02 | 카테고리 filter vs kw | ✅ |
+| B-03 | 다운로드 `fil_data` | ✅ |
+| B-04 | CSV `text` 무시 | ✅ |
+| B-05 | 업로드 후 미분석 | ✅ |
+| B-06 | 로그 UI 없음 | ✅ (토글 잔여) |
 
 ---
 
@@ -210,3 +253,4 @@ Browser → app.py (라우트)
 | 버전 | 날짜 | 변경 내용 |
 |------|------|-----------|
 | 1.0 | 2026-05-22 | 초기 PRD 작성 (코드·project_purpose 분석 기반) |
+| 1.1 | 2026-05-22 | Phase 3-B — §2.4 CSV, §2.5 카테고리 ADR, §4 Green Resolved |

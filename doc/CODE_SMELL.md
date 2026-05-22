@@ -3,7 +3,8 @@
 | 항목 | 내용 |
 |------|------|
 | 일자 | 2026-05-22 |
-| 기준 문서 | [PRD.md](PRD.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
+| 갱신 | Phase 3-B — Green 해소 스멜 표기 |
+| 기준 문서 | [PRD.md](PRD.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md), [ADR-001](ADR-001-category-main-only.md) |
 | 분석 대상 | `src/python/*.py` (8모듈) |
 
 ---
@@ -19,7 +20,25 @@
 | 테스트·관측성 | 3 | 커버리지 90% 목표 |
 | **버그 유발 스멜** | **4** | Mom Test 실무 ❌ Fail |
 
-**핵심 원인**: 동일 도메인 규칙이 **3곳**에 다르게 존재 — `constants.py` / `filters.S_KEYWORDS` / `text_analyzer`·`filter_feedbacks` 분기.
+**Red 시 핵심 원인**: 감정·카테고리 규칙이 `constants` / `filters.S_KEYWORDS` / analyzer에 **이중화**.  
+**Green 후**: `classify_sentiment()`, `matches_category()` SSOT — 아래 **✅ Green** 항목은 Phase 2에서 해소, Phase 3-C에서 구조 스멜 잔여.
+
+---
+
+## 1.1 Green 해소 요약 (2026-05-22)
+
+| 스멜 ID | PRD | Green 조치 | 상태 |
+|---------|-----|------------|------|
+| S-F01, S-F02 | B-01 | `S_KEYWORDS` 제거, `classify_sentiment()` | ✅ |
+| S-F03, S-T05 | B-02 | `matches_category()` main-only ([ADR-001](ADR-001-category-main-only.md)) | ✅ |
+| S-T04 | B-01 | 감정 else→중립, `화가` 등 constants | ✅ |
+| S-A03, S-A04 | B-03 | `fil_data` 제거 → Session | ✅ |
+| S-A06 | B-04 | `_parse_csv_to_feedbacks` ([CSV_FORMAT](CSV_FORMAT.md)) | ✅ |
+| S-A07 | B-05 | upload 후 sent/kw | ✅ |
+| S-F04 | — | `filters` print 제거 | ✅ |
+| S-L02 | B-06 | Logger 페이지 warning/error | ✅ (토글 DEF-008) |
+
+**Phase 3-C 잔여:** S-A01, S-A02, S-T01, S-T02, S-T03, S-FH01, S-S01~S-S02 등
 
 ---
 
@@ -31,11 +50,11 @@
 |----|------|--------|-----------|
 | S-A01 | God Function | High | `render_page()` ~135줄 — CSS·HTML·폼·결과 일체 |
 | S-A02 | God Module | High | 라우팅·비즈니스·프레젠테이션·CSV 혼재 |
-| S-A03 | 전역 `fil_data` | High | `/filter`만 갱신 → 다운로드 불일치 (B-03) |
-| S-A04 | 불필요한 `global fil_data` | Low | `analyze`에서 선언만 하고 미사용 |
+| S-A03 | 전역 `fil_data` | High | ~~B-03~~ → **✅ Green** Session.download |
+| S-A04 | 불필요한 `global fil_data` | Low | ~~제거됨~~ **✅ Green** |
 | S-A05 | Primitive Obsession | Med | `list`, `dict`만 전달, 도메인 모델 빈약 |
-| S-A06 | CSV 스펙 불일치 | Med | 0번 컬럼·첫 행 무조건 스킵 (B-04) |
-| S-A07 | 업로드 후 분석 누락 | Low | `/upload`가 `sent`/`kw` 미호출 (B-05) |
+| S-A06 | CSV 스펙 불일치 | Med | ~~B-04~~ → **✅ Green** [CSV_FORMAT](CSV_FORMAT.md) |
+| S-A07 | 업로드 후 분석 누락 | Low | ~~B-05~~ → **✅ Green** |
 
 ### 2.2 `text_analyzer.py`
 
@@ -44,17 +63,17 @@
 | S-T01 | 부적절한 네이밍 | Med | `sent`, `kw` |
 | S-T02 | 클래스 변수 부작용 | High | `global_sent`, `global_kw` |
 | S-T03 | 중복 `_contains_any` | High | `filters.py`와 동일 |
-| S-T04 | 불완전한 감정 규칙 | High | 중립 키워드 없음 → else만 중립 (B-01) |
-| S-T05 | `kw()` main만 매칭 | High | `filter`와 sub/main 불일치 (B-02) |
+| S-T04 | 불완전한 감정 규칙 | High | ~~B-01~~ → **✅ Green** `classify_sentiment()` |
+| S-T05 | `kw()` main만 매칭 | High | ~~B-02~~ → **✅ Green** `matches_category()` ([ADR-001](ADR-001-category-main-only.md)) |
 
 ### 2.3 `filters.py`
 
 | ID | 스멜 | 심각도 | 위치·설명 |
 |----|------|--------|-----------|
-| S-F01 | 데이터 3중 정의 | **Critical** | `S_KEYWORDS` ≠ `constants.SENTIMENT_KEYWORDS` |
-| S-F02 | 감정 규칙 불일치 | **Critical** | 3단계+중립 키워드 vs analyzer 2단계+else |
-| S-F03 | 카테고리 `main` 스킵 | **Critical** | L60-62 `continue` on `main` |
-| S-F04 | Debug 잔류 | Med | L69-70 `print(fb.text)` |
+| S-F01 | 데이터 3중 정의 | **Critical** | ~~`S_KEYWORDS`~~ → **✅ Green** 제거 |
+| S-F02 | 감정 규칙 불일치 | **Critical** | ~~이중 규칙~~ → **✅ Green** SSOT |
+| S-F03 | 카테고리 `main` 스킵 | **Critical** | ~~filter 스킵~~ → **✅ Green** main-only 정책 |
+| S-F04 | Debug 잔류 | Med | ~~print~~ → **✅ Green** 제거 |
 | S-F05 | Feature Envy | High | `CATEGORY_KEYWORDS` sub_key 순회 |
 | S-F06 | 키워드 충돌 | Med | `괜찮`이 긍정·중립 양쪽 |
 
@@ -86,7 +105,7 @@
 | ID | 스멜 | 심각도 |
 |----|------|--------|
 | S-L01 | UI와 단절된 print Logger | Med |
-| S-L02 | warning/error 미표시 (B-06) | Med |
+| S-L02 | warning/error 미표시 (B-06) | Med | ~~B-06~~ → **✅ Green** (UI 토글 DEF-008 잔여) |
 
 ### 2.8 `file_handler.py`
 
@@ -102,8 +121,8 @@
 | 안티패턴 | 코드 |
 |----------|------|
 | God Function | `app.render_page` |
-| Spaghetti Code | Session + fil_data + global_sent/kw |
-| Shotgun Surgery | constants + S_KEYWORDS + analyzer |
+| Spaghetti Code | Session + ~~fil_data~~ + global_sent/kw (fil_data ✅) |
+| Shotgun Surgery | ~~S_KEYWORDS~~ + constants (감정 ✅, 카테고리 main SSOT) |
 | Feature Envy | filters → CATEGORY_KEYWORDS 구조 |
 | Lava Flow | file_handler.py |
 
@@ -113,12 +132,12 @@
 
 | 스멜 | PRD | Mom Test |
 |------|-----|----------|
-| S-F01, S-F02, S-T04 | B-01 | H-02 ❌ |
-| S-F03, S-T05 | B-02 | H-03, H-04 ❌ |
-| S-A03 | B-03 | 다운로드 신뢰 |
-| S-A06 | B-04 | H-05 ❌ |
-| S-A07 | B-05 | — |
-| S-L02 | B-06 | — |
+| S-F01, S-F02, S-T04 | B-01 | H-02 ✅ Green |
+| S-F03, S-T05 | B-02 | H-03, H-04 ✅ Green |
+| S-A03 | B-03 | ✅ |
+| S-A06 | B-04 | H-05 ✅ Green |
+| S-A07 | B-05 | ✅ |
+| S-L02 | B-06 | ✅ |
 
 ---
 
@@ -135,11 +154,12 @@
 
 ## 6. 리팩토링 권장 순서
 
-1. `classify_sentiment()` 단일화 — `S_KEYWORDS` 제거  
-2. `match_category()` 단일화 — main+sub 동일 규칙  
-3. `fil_data` 제거 → 세션/DTO  
-4. `render_page` → 템플릿/HtmlRenderer  
-5. pytest + Mom Test §8 체크리스트 고정  
+1. ~~`classify_sentiment()` 단일화~~ — **✅ Green**  
+2. ~~`matches_category()` main 통일~~ — **✅ Green** ([ADR-001](ADR-001-category-main-only.md))  
+3. ~~`fil_data` 제거~~ — **✅ Green**  
+4. `render_page` → 템플릿/HtmlRenderer — **⏳ Phase 3-C**  
+5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
+6. `global_sent/kw`, `file_handler`, 네이밍 — **⏳ Phase 3-C**  
 
 ---
 

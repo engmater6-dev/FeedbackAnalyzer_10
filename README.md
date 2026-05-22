@@ -10,7 +10,8 @@
 > - Mom Test: [doc/MOM_TEST.md](doc/MOM_TEST.md)  
 > - 코드 스멜 분석: [doc/CODE_SMELL.md](doc/CODE_SMELL.md)  
 > - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)  
-> - QA 결함 목록: [doc/defect_list.md](doc/defect_list.md)
+> - QA 결함 목록: [doc/defect_list.md](doc/defect_list.md)  
+> - CSV 규격 · 카테고리 정책: [doc/CSV_FORMAT.md](doc/CSV_FORMAT.md), [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)
 
 > **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). 화면에는 **건수 통계 요약** 위주이며, 고급 시각화·검색은 [Mom Test](doc/MOM_TEST.md) 기준 제한적입니다.
 
@@ -150,9 +151,21 @@ FeedbackAnalyzer_10/
 
 ## CSV 파일 형식
 
-- 권장: 첫 행 헤더에 **`text`** 컬럼
-- 구현 (B-04): 헤더에 `text`가 있으면 해당 컬럼 사용, 없으면 **0번 컬럼** 전 행 파싱
-- 업로드 직후 감정·키워드 집계 표시 (B-05)
+상세 규격: [doc/CSV_FORMAT.md](doc/CSV_FORMAT.md)
+
+| 모드 | 조건 | 동작 |
+|------|------|------|
+| **표준 (권장)** | 1행에 `text` 헤더 | 2행부터 `text` 열만 피드백으로 적재 |
+| **레거시** | `text` 헤더 없음 | **0번 열**, **1행 포함** 전 행을 본문으로 파싱 |
+
+- UTF-8 (BOM 허용) · 빈 셀/빈 행 스킵 · 업로드 직후 감정·키워드 집계 (B-05)
+- 다운로드 CSV도 항상 `text` 헤더 + 본문 1열
+
+## 카테고리 분류 정책
+
+- **main 키워드만** 본문 substring 매칭 (`matches_category`) — [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)
+- `kw()` 집계와 필터 드롭다운 건수 **동일 규칙** (B-02)
+- `constants`의 `sub` 맵은 v1에서 매칭에 사용하지 않음
 
 ---
 
@@ -167,7 +180,8 @@ FeedbackAnalyzer_10/
 | Phase 0 | **대부분 완료** | 문서·스멜 분석 완료 · `python app.py` 수동 확인 `[ ]` |
 | Phase 1 | **완료** | Domain 6 + IT 8 + Golden 1 · **39 passed** · cov **97.4%** |
 | Phase 2 | **B-01~B-06 완료** | Green Step 0~6 · [report/](report/) · [defect_list.md](doc/defect_list.md) |
-| Phase 3~6 | **미착수** | Refactor·구조·Trend·DB·리뷰 |
+| Phase 3 | **진행 중** (`refactor`) | 3-A 문서 ✅ · **3-B CSV·main-only 정책 ✅** · 3-C Refactor ⏳ |
+| Phase 4~6 | **미착수** | 구조·Trend·DB·리뷰 |
 
 **테스트 실행** (`src/python`):
 

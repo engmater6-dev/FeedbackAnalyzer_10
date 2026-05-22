@@ -16,9 +16,9 @@
 | 구분 | 건수 |
 |------|------|
 | **전체** | 23 |
-| **완료** | 15 |
-| **부분완료** | 3 |
-| **미완료** | 5 |
+| **완료** | 17 |
+| **부분완료** | 4 |
+| **미완료** | 3 |
 
 | Severity | 완료 | 미완료·부분 |
 |----------|------|-------------|
@@ -56,13 +56,13 @@
 | DEF-012 | Medium | 테스트결함 | **Green Step 6** | CSV `text` E2E | upload IT Pass | 없음 | IT 없음 | `test_post_upload_text_header_csv` | **완료** |
 | DEF-013 | Low | UX | **Green Step 6** | 연속 요청 로그 | 요청별만 | 누적 | 버퍼 미클리어 | `_begin_page_request()` | **완료** |
 | DEF-014 | Low | UX | **Green Step 6** | 빈 `/download` | 안내 | 빈 CSV | 빈 목록 허용 | warning + 버튼 조건 | **완료** |
-| DEF-015 | Medium | 기능결함 | Phase 3/문서 | CSV 헤더 없음 0열 | 명시적 규칙 | 레거시 0열 | 휴리스틱 없음 | `test_csv_parse`·문서 명시 | **부분완료** |
-| DEF-016 | Medium | 기능결함 | Phase 3/문서 | `"택배만"` 본문 | 배송 1건? | 0건 | main-only 설계 | 문서화 또는 sub 확장 | **미완료** |
+| DEF-015 | Medium | 기능결함 | Phase 3/문서 | CSV 헤더 없음 0열 | 명시적 규칙 | 레거시 0열 | 휴리스틱 없음 | [CSV_FORMAT.md](CSV_FORMAT.md) §2 | **완료** |
+| DEF-016 | Medium | 기능결함 | Phase 3/문서 | sub-only 본문 | main-only 정책 | 0건 가능 | By design | [ADR-001](ADR-001-category-main-only.md) Won't fix v1 | **완료** |
 | DEF-017 | High | 구조/기술부채 | Phase 3 | `render_page` | 분리 | God Function | S-A01 | 템플릿 분리 | **미완료** |
 | DEF-018 | High | 구조/기술부채 | Phase 3 | `global_sent/kw` | 인스턴스 상태 | 클래스 변수 | S-T02 | DTO·전역 제거 | **미완료** |
 | DEF-019 | Medium | 구조/기술부채 | Phase 3 | `file_handler.py` | 사용/삭제 | Lava Flow | S-FH01 | 삭제 또는 연동 | **미완료** |
-| DEF-020 | Medium | 문서 | Phase 3/6 | MOM_TEST §7~8 | Partial Go | Fail | 미갱신 | §8·§7 갱신 | **미완료** |
-| DEF-021 | Low | 문서 | Phase 3/6 | test_plan 메타 | `green` | `red` | 미갱신 | 표지·Gate 갱신 | **미완료** |
+| DEF-020 | Medium | 문서 | Phase 3/6 | MOM_TEST §7~8 | Partial Go | Fail | 미갱신 | §7.2 Partial Go, §8 자동 `[x]` (Phase 3-A) | **부분완료** — §8 인터뷰·Phase 6 최종 |
+| DEF-021 | Low | 문서 | Phase 3/6 | test_plan 메타 | `green` | `red` | 미갱신 | v1.1·Gate 39/cov 97% (Phase 3-A) | **부분완료** — Phase 6 최종 스냅샷 |
 | DEF-022 | Low | 문서 | Phase 3/6 | README 기능 문구 | 건수 요약 | 시각화 과장 | 가설 괴리 | README 문구 완화(2026-05-22) | **부분완료** |
 | DEF-023 | Medium | 테스트결함 | Green Step 7 | Domain 출력 스냅샷 회귀 | `golden_master_expected.txt` 대비 일치 | 수동 only | Approval 미적용 | Golden Master + `generate_golden_master.py` | **완료** |
 
@@ -194,17 +194,17 @@ python scripts/generate_golden_master.py --check
 
 | 순서 | 체크 | 작업 | DEF |
 |------|------|------|-----|
-| 3-A-1 | [ ] | [MOM_TEST.md](MOM_TEST.md) §7: VOC **Partial Go** (Domain·IT 통과 근거) | 020 |
-| 3-A-2 | [ ] | [MOM_TEST.md](MOM_TEST.md) §8: 자동 4항목 `[x]`, 인터뷰 `[ ]` 유지 | 020 |
-| 3-A-3 | [ ] | [test_plan.md](test_plan.md): 대상 브랜치 `green`, Gate 39 passed·cov 97% | 021 |
+| 3-A-1 | [x] | [MOM_TEST.md](MOM_TEST.md) §7: VOC **Partial Go** (Domain·IT 통과 근거) | 020 |
+| 3-A-2 | [x] | [MOM_TEST.md](MOM_TEST.md) §8: 자동 4항목 `[x]`, 인터뷰 `[ ]` 유지 | 020 |
+| 3-A-3 | [x] | [test_plan.md](test_plan.md): 대상 브랜치 `green`, Gate 39 passed·cov 97% | 021 |
 
 #### 3-B. 설계·문서 (코드 변경 최소, 30분)
 
 | 순서 | 체크 | 작업 | DEF | 완료 기준 |
 |------|------|------|-----|-----------|
-| 3-B-1 | [ ] | PRD/README에 CSV 규칙 명시: `text` 헤더 권장, 없으면 0열 전체 | 015 | 문서 1절 |
-| 3-B-2 | [ ] | 카테고리 **main-only** vs sub 키워드 정책 결정·기록 | 016 | ADR 1페이지 또는 PRD § |
-| 3-B-3 | [ ] | [CODE_SMELL.md](CODE_SMELL.md) Green 해소 항목 반영 (S-F01, S-A03 등) | 020 | 스멜 표 갱신 |
+| 3-B-1 | [x] | PRD/README·[CSV_FORMAT.md](CSV_FORMAT.md): `text` 헤더 권장, 없으면 0열 전체 | 015 | SPEC-CSV-01 |
+| 3-B-2 | [x] | [ADR-001](ADR-001-category-main-only.md) main-only **Accepted**, sub Won't fix v1 | 016 | Phase 5 재검토 |
+| 3-B-3 | [x] | [CODE_SMELL.md](CODE_SMELL.md) §1.1 Green 해소 표 | 020 | Phase 3-C 잔여 명시 |
 
 #### 3-C. 구현 — Refactor (약 1.5시간)
 
@@ -329,13 +329,13 @@ python scripts/generate_golden_master.py --check
 | ID | 담당 Phase | Phase 6 종결 조건 |
 |----|------------|-------------------|
 | DEF-008 | 3-C-4 | UI 토글 동작 |
-| DEF-015 | 3-B-1 | 문서 명시 |
-| DEF-016 | 3-B-2, 5-5 | 정책 문서 또는 구현+GM 갱신 |
+| DEF-015 | 3-B-1 ✅ | [CSV_FORMAT.md](CSV_FORMAT.md) |
+| DEF-016 | 3-B-2 ✅ | [ADR-001](ADR-001-category-main-only.md) — sub 확장 Phase 5 |
 | DEF-017 | 3-C-2 | render 분리 |
 | DEF-018 | 3-C-1 | global 제거 |
 | DEF-019 | 3-C-3 | file_handler 정리 |
-| DEF-020 | 6-A-2, 6-A-5 | MOM_TEST·PRD |
-| DEF-021 | 6-A-3 | test_plan |
+| DEF-020 | 3-A-1~2 ✅, 6-A-2 | Phase 6 §7·§8 최종 |
+| DEF-021 | 3-A-3 ✅, 6-A-3 | Phase 6 최종 스냅샷 |
 | DEF-022 | 6-A-4 | README (차트 선택) |
 
 ---
@@ -348,3 +348,5 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Step 6 — DEF-010~014 완료, cov 97.42%, **예정 Phase** 컬럼 추가 |
 | 2026-05-22 | Golden Master DEF-023, README·defect_list 진행사항 동기화 (39 tests) |
 | 2026-05-22 | §6 Phase 0~6 작업 순서 체크리스트 세분화 (Phase 6 Gate) |
+| 2026-05-22 | Phase 3-A — MOM_TEST v1.1 Partial Go, test_plan v1.1 Green Gate, DEF-020/021 부분완료 |
+| 2026-05-22 | Phase 3-B — CSV_FORMAT, ADR-001 main-only, PRD v1.1, DEF-015/016 완료 |
