@@ -12,9 +12,10 @@
 > - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)  
 > - QA 결함 목록: [doc/defect_list.md](doc/defect_list.md)  
 > - CSV 규격 · 카테고리 정책: [doc/CSV_FORMAT.md](doc/CSV_FORMAT.md), [doc/ADR-001-category-main-only.md](doc/ADR-001-category-main-only.md)  
-> - 감정 키워드 DB: [doc/KEYWORD_DB.md](doc/KEYWORD_DB.md)
+> - 감정 키워드 DB: [doc/KEYWORD_DB.md](doc/KEYWORD_DB.md)  
+> - 코드 리뷰·전후 비교: [review_report.md](review_report.md), [report/refactoring_before_after.md](report/refactoring_before_after.md)
 
-> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). **건수 통계** + `date,text` CSV 업로드 시 **월별 추이(Trend)**. 감정 키워드는 SQLite DB에서 CRUD ([Mom Test](doc/MOM_TEST.md) 실무 검증은 Phase 6).
+> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). **건수 통계** + `date,text` CSV 업로드 시 **월별 추이(Trend)**. 감정 키워드는 SQLite DB에서 CRUD. Phase 6: 수동 E2E·발표·DEF-020~022 문서 종결 잔여 ([Mom Test](doc/MOM_TEST.md)).
 
 ## 주요 기능
 
@@ -113,13 +114,14 @@ FeedbackAnalyzer_10/
 │   ├── PRD.md                 # 제품 요구사항 정의서
 │   ├── MOM_TEST.md            # Mom Test 검증 보고서
 │   ├── CODE_SMELL.md          # src 코드 스멜 분석
-│   ├── test_plan.md           # 테스트 계획서 (v1.1)
+│   ├── test_plan.md           # 테스트 계획서 (v1.2)
 │   ├── CSV_FORMAT.md          # CSV 업로드 규격 (3-B)
 │   ├── ADR-001-category-main-only.md  # 카테고리 main-only 정책
 │   ├── KEYWORD_DB.md          # SQLite 감정 키워드 (Phase 5, R-10)
 │   └── defect_list.md         # QA 결함 23건 (완료 21 · 부분 3)
-├── report/                    # 01.red ~ 05.phase5_* (trend, keyword_db)
-├── prompt/                    # 단계별 프롬프트·축약 답변 (04.feature 등)
+├── report/                    # 01.red ~ 05.new_feature · refactoring_before_after
+├── review_report.md           # Cursor AI 코드 리뷰·개선 보고서 (Phase 6)
+├── prompt/                    # 단계별 프롬프트·축약 답변 (05.new_feature 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
 │   ├── app.py                 # Flask 부트스트랩·Blueprint 등록
@@ -195,15 +197,16 @@ FeedbackAnalyzer_10/
 | Phase 2 | **완료** (`green`) | B-01~B-06 · [report/02.green.md](report/02.green.md) |
 | Phase 3 | **완료** (`refactor`) | 3-A~B 문서 · **3-C-1~7** · **3-D Gate** |
 | Phase 4 | **완료** | R-07·R-08 · [report/04.feature.md](report/04.feature.md) · **4-D Gate** |
-| Phase 5 | **완료** | R-09 Trend · R-10 SQLite 키워드 · [report/05.phase5_trend.md](report/05.phase5_trend.md) · [report/05.phase5_keyword_db.md](report/05.phase5_keyword_db.md) |
-| Phase 6 | **미착수** | 팀 리뷰 · DEF-020~022 종결 · 발표 |
+| Phase 5 | **완료** | R-09 Trend · R-10 SQLite · [report/05.new_feature.md](report/05.new_feature.md) |
+| Phase 6 | **진행 중** | 전후 비교·코드 리뷰 ✅ · 수동 E2E·발표 `[ ]` |
 
-| 지표 (Phase 5 Gate · `new_feature`) | 수치 |
-|--------------------------------------|------|
+| 지표 (최종 Gate · `new_feature`) | 수치 |
+|----------------------------------|------|
 | pytest | **79 passed** |
 | 커버리지 | **94.15%** |
 | Golden Master | **pass** (`--check`) |
 | QA 결함 | 완료 **21** · 부분 **3** (DEF-020~022) · 미완료 **0** ([defect_list.md](doc/defect_list.md)) |
+| Phase 6 산출물 | [review_report.md](review_report.md) · [report/refactoring_before_after.md](report/refactoring_before_after.md) |
 
 **테스트 실행** (`src/python`):
 
@@ -247,6 +250,14 @@ python scripts/generate_golden_master.py --check
 **Green 합격 조건 (Domain 최소)** — [x] PRD 예시 부정·배송 필터 · [x] 중립 3건 일치 · [x] `"품질"` main only 일치
 
 **QA (Green 후)** — 기능·구조 DEF **완료**. 문서·발표 DEF-020~022는 Phase 6에서 종결 ([defect_list.md](doc/defect_list.md)).
+
+**Post-Green Gate (Phase 3~5 · 회귀 유지)**
+
+| Gate | 브랜치 | pytest | cov | Golden Master |
+|------|--------|--------|-----|---------------|
+| 3-D Refactor | `refactor` | 50 passed | 97.78% | pass |
+| 4-D 구조 | `feature/phase-4-structure` | 55 passed | 97.57% | pass |
+| 5-D 확장 | `new_feature` | **79 passed** | **94.15%** | pass |
 
 ---
 
@@ -307,7 +318,7 @@ python scripts/generate_golden_master.py --check
 
 #### 3-A · 문서 초안
 - [x] [MOM_TEST.md](doc/MOM_TEST.md) §7 Partial Go · §8 자동 `[x]` (로컬, 커밋 대기 가능)
-- [x] [test_plan.md](doc/test_plan.md) v1.1 Green Gate
+- [x] [test_plan.md](doc/test_plan.md) v1.1 Green Gate · v1.2 Phase 5 Gate (79 passed)
 
 #### 3-B · 설계·정책
 - [x] [CSV_FORMAT.md](doc/CSV_FORMAT.md) · [ADR-001](doc/ADR-001-category-main-only.md)
@@ -352,9 +363,27 @@ python scripts/generate_golden_master.py --check
 
 ### Phase 6 — 리뷰·발표 (약 2시간)
 
-- [ ] `report/`에 팀 리뷰·장단점 (스멜 개선 전/후)
-- [ ] Mom Test §8 재검증 체크리스트 완료
-- [ ] 발표 준비
+#### 6-A · 문서·동기화
+- [ ] Phase 0 수동 E2E — `report/manual_e2e_phase0.md`
+- [ ] Mom Test §7·§8 최종 판정 (인터뷰 선택)
+- [x] [test_plan.md](doc/test_plan.md) v1.2 · Gate **79 passed** (`new_feature`)
+- [x] README ↔ [defect_list.md](doc/defect_list.md) §6 진행사항 동기화
+- [x] PRD §4 B-01~06 **Resolved** ([doc/PRD.md](doc/PRD.md))
+
+#### 6-B · 리뷰·전후 비교
+- [x] Red vs Green 전/후 비교 — [report/refactoring_before_after.md](report/refactoring_before_after.md)
+- [x] Cursor AI 코드 리뷰 — [review_report.md](review_report.md)
+- [ ] `report/team_review.md` (선택 · review_report로 대체 가능)
+- [ ] 타 팀 1건 리뷰 (선택)
+
+#### 6-C · Gate 재실행
+- [x] `pytest tests/ -v` — **79 passed**
+- [x] `pytest tests/ --cov --cov-fail-under=90` — **94.15%**
+- [x] `python scripts/generate_golden_master.py --check` — OK
+
+#### 6-D · 발표
+- [ ] 발표 슬라이드·라이브 데모 (Phase 0-2 시나리오)
+- [ ] Q&A: DEF-016 main-only, Golden Master 워크플로
 
 ---
 

@@ -158,17 +158,18 @@ Browser → app.py (라우트)
 
 ---
 
-## 5. 의도적 기술 부채 (학습용, 제거 대상)
+## 5. 의도적 기술 부채 (학습용) — 제거 현황
 
-| 유형 | 위치 | 학습 목표 |
-|------|------|-----------|
-| God Function | `app.render_page()` | HTML·라우팅·처리 분리 |
-| 중복 코드 | `_contains_any` in `text_analyzer`, `filters` | 공통 유틸 추출 |
-| 전역 상태 | `fil_data`, `global_sent`, `global_kw` | 세션/서비스 객체로 이전 |
-| 부적절한 네이밍 | `sent`, `kw`, `fil` | 의미 있는 이름 |
-| Lava Flow | ~~`file_handler.py`~~ | **✅ 제거** (3-C-3) |
-| 테스트 부재 | 전체 | pytest + 90% coverage |
-| Shotgun Surgery | 키워드 3곳 이상 | constants 단일화 |
+| 유형 | Red 위치 | After (`new_feature`) | Phase |
+|------|----------|------------------------|-------|
+| God Function | `app.render_page()` | `html_renderer.HtmlRenderer` | 3-C-2 ✅ |
+| 중복 코드 | `_contains_any` ×2 | `text_utils.contains_any` | 3-C-6 ✅ |
+| 전역 상태 | `fil_data`, `global_sent`, `global_kw` | `Session` 인스턴스·반환값만 | Green·3-C-1 ✅ |
+| 부적절한 네이밍 | `sent`, `kw` | `analyze_sentiments`, `analyze_keywords` | 3-C-5 ✅ |
+| Lava Flow | `file_handler.py` | 삭제 | 3-C-3 ✅ |
+| 테스트 부재 | 없음 | **79 tests**, cov **94.15%** | Green~5 ✅ |
+| Shotgun Surgery | `S_KEYWORDS` + constants | `classify_sentiment()` + SQLite | Green·5 ✅ |
+| 레이어 혼재 | 단일 `app.py` | handlers / services / models | Phase 4 ✅ |
 
 ---
 

@@ -33,9 +33,9 @@
 | Phase 3 Refactor (`refactor`) | ✅ 3-A~3-D (3-C-1~7, Gate **50 passed**) |
 | Phase 4 구조 (`feature/phase-4-structure`) | ✅ 4-1~4-5 · Gate **55 passed** |
 | Phase 5 확장 (`new_feature`) | ✅ 5-2~5-4 Trend·SQLite · Gate **79 passed** |
-| Phase 6 QA 종결 | ⏳ §6.6 Gate (DEF-020~022 문서·발표) |
+| Phase 6 QA 종결 | ⏳ **진행 중** — 전후 비교·코드 리뷰 ✅ · 수동 E2E·발표 `[ ]` |
 
-> **최종 갱신 (2026-05-22 · `new_feature`):** pytest **79 passed** · cov **94.15%** · Golden Master **OK** · Phase 5 R-09/R-10 완료 · DEF-016 main-only 문서 확정 · DEF **020~022 부분완료**
+> **최종 갱신 (2026-05-22 · `new_feature`):** pytest **79 passed** · cov **94.15%** · Golden Master **OK** · Phase 5 완료 · Phase 6: [review_report.md](../review_report.md), [refactoring_before_after.md](../report/refactoring_before_after.md) · DEF **020~022 부분완료**
 
 ---
 
@@ -94,17 +94,17 @@
 
 ---
 
-## 5. 테스트·회귀 현황 (2026-05-22 · `refactor`)
+## 5. 테스트·회귀 현황 (2026-05-22 · `new_feature`)
 
 | 구분 | 수치 | 명령 |
 |------|------|------|
-| 전체 | **50 passed** | `pytest tests/ -q` |
-| 커버리지 | **97.78%** | `pytest tests/ --cov --cov-fail-under=90` |
-| Domain Gate | 6+ | Anchor·회귀·`test_text_utils`·`test_analysis_strategies` |
-| Boundary IT | 12+ | `test_routes_analyze_filter` (로그 설정 IT 포함) |
+| 전체 | **79 passed** | `pytest tests/ -q` |
+| 커버리지 | **94.15%** | `pytest tests/ --cov --cov-fail-under=90` |
+| Domain Gate | 6+ | Anchor·회귀·trend·keyword_db |
+| Boundary IT | 20+ | analyze/filter/upload/download·trend·keywords |
 | Golden Master | 1 | `test_golden_master` · `generate_golden_master.py --check` |
 
-**모듈 커버리지:** `analysis_strategies`, `text_utils`, `html_renderer`, `text_analyzer` 등 **100%** 또는 **≥96%**
+**Phase 6 Gate 재실행 (2026-05-22):** 6-C-1~3 **pass** (79 tests, cov 94.15%, GM OK)
 
 ---
 
@@ -126,7 +126,7 @@ Phase 4 ✅ 구조·모델 (R-07/R-08)
     ↓
 Phase 5 ✅ Trend·SQLite 키워드 DB
     ↓
-Phase 6 [ ] 리뷰·문서·발표  ← DEF-020~022 최종
+Phase 6 [~] 리뷰·문서·발표  ← 전후 비교·리뷰 보고서 ✅ · E2E·발표 [ ]
 ```
 
 | Phase | 예상 | DEF·산출물 | Gate 요약 |
@@ -136,7 +136,7 @@ Phase 6 [ ] 리뷰·문서·발표  ← DEF-020~022 최종
 | **3** | **✅** | **008~019, 015~016 문서, 3-C-1~7** | **50 passed, cov 97.78%, GM OK** |
 | 4 | ✅ | R-07/R-08 | handlers/services/models |
 | 5 | ✅ | R-09/R-10 | Trend CSV·UI·keyword_db |
-| **6** | **2h** | **020~022, report, 발표** | **실습 종결 Gate** |
+| **6** | **2h** | **020~022, review_report, 발표** | **실습 종결 Gate** (진행 중) |
 
 ---
 
@@ -275,16 +275,16 @@ python scripts/generate_golden_master.py --check
 |------|------|------|-----|--------|
 | 6-A-1 | [ ] | Phase 0 수동 E2E 결과 `report/` 반영 | — | `manual_e2e_phase0.md` |
 | 6-A-2 | [ ] | MOM_TEST §7·§8 최종 판정·체크박스 | 020 | §8 전항목 상태 확정 |
-| 6-A-3 | [ ] | test_plan 표지·Gate·브랜치 `green` | 021 | v1.1 등 버전 기록 |
-| 6-A-4 | [ ] | README Phase 3~6 체크리스트 ↔ 본 문서 §6 동기화 | 022 | README `[x]` 반영 |
-| 6-A-5 | [ ] | PRD §4 알려진 문제 → **해결/잔여** 표 갱신 | 020 | B-01~06 Resolved |
+| 6-A-3 | [x] | test_plan v1.2 · Gate **79 passed** · `new_feature` | 021 | [test_plan.md](test_plan.md) v1.2 |
+| 6-A-4 | [x] | README Phase 3~6 ↔ 본 문서 §6 동기화 | 022 | README·doc 갱신 |
+| 6-A-5 | [x] | PRD §4 B-01~06 **Resolved** | 020 | [PRD.md](PRD.md) §4.1 |
 
 #### 6-B. 팀 리뷰·비교 (50분)
 
 | 순서 | 체크 | 작업 | 산출물 |
 |------|------|------|--------|
-| 6-B-1 | [ ] | Red vs Green **전/후** 비교 (버그·스멜·테스트 수) | |
-| 6-B-2 | [ ] | `report/team_review.md` — 장점 3·단점 3·개선 제안 2 | README Phase 6 |
+| 6-B-1 | [x] | Red vs Green **전/후** 비교 | [refactoring_before_after.md](../report/refactoring_before_after.md) |
+| 6-B-2 | [x] | 코드 리뷰·개선 보고서 | [review_report.md](../review_report.md) |
 | 6-B-3 | [ ] | 타 팀 프로젝트 1건 리뷰 (Mom Test 관점) | 동일 파일 § |
 | 6-B-4 | [ ] | `defect_list.md` §1 요약: 완료/미완료 건수 **최종 스냅샷** | |
 
@@ -292,9 +292,9 @@ python scripts/generate_golden_master.py --check
 
 | 순서 | 체크 | 명령 | 기대 |
 |------|------|------|------|
-| 6-C-1 | [ ] | `pytest tests/ -v` | 39+ passed |
-| 6-C-2 | [ ] | `pytest tests/ --cov --cov-fail-under=90` | ≥90% |
-| 6-C-3 | [ ] | `python scripts/generate_golden_master.py --check` | OK |
+| 6-C-1 | [x] | `pytest tests/ -v` | **79 passed** |
+| 6-C-2 | [x] | `pytest tests/ --cov --cov-fail-under=90` | **94.15%** |
+| 6-C-3 | [x] | `python scripts/generate_golden_master.py --check` | OK |
 | 6-C-4 | [ ] | (선택) `report/coverage_html` 아카이브 | CI/발표용 |
 
 #### 6-D. 발표 준비 (35분)
@@ -319,9 +319,10 @@ python scripts/generate_golden_master.py --check
 
 **Phase 6 Gate (실습 완료 정의):**
 
-- [ ] 6-A-2, 6-A-3, 6-A-5 완료  
-- [ ] 6-B-2 팀 리뷰 문서  
-- [ ] 6-C-1~6-C-3 pass  
+- [ ] 6-A-2 Mom Test §8 최종 (인터뷰 선택)  
+- [x] 6-A-3, 6-A-4, 6-A-5 완료  
+- [x] 6-B-1, 6-B-2 리뷰·전후 비교 문서  
+- [x] 6-C-1~6-C-3 pass  
 - [ ] 6-D-1 발표 자료  
 - [ ] `defect_list.md` §1: **미완료 0** (또는 Won't fix 1表 with 사유)
 
@@ -334,8 +335,8 @@ python scripts/generate_golden_master.py --check
 | DEF-008~019 | **완료** | — |
 | DEF-015, 016 | **완료** | CSV_FORMAT · ADR-001 |
 | DEF-020 | **부분완료** | MOM_TEST §8 인터뷰 · §7 최종 (6-A-2) |
-| DEF-021 | **부분완료** | test_plan `refactor` Gate 50 tests (6-A-3) |
-| DEF-022 | **부분완료** | README Phase 4~6·차트 정책 (6-A-4) |
+| DEF-021 | **부분완료** | test_plan v1.2 Gate 79 tests ✅ · Phase 6 발표 스냅샷 |
+| DEF-022 | **부분완료** | README·리뷰 보고서 반영 ✅ · 발표 자료 |
 
 **`refactor` 주요 커밋:** `CSV 규칙·main-only 정책 문서` → `global_sent, global_kw 제거` → `render_page 분리` → `file_handler 제거` → `Logger UI 토글` → `contains_any 공통 유틸` → `분석 전략 패턴 적용` → `sent/kw 네이밍 개선`
 
@@ -356,3 +357,4 @@ python scripts/generate_golden_master.py --check
 | 2026-05-22 | Phase 3-C-4 — Logger UI 토글, DEF-008 완료 |
 | 2026-05-22 | Phase 3-C-5~7 — 네이밍·text_utils·전략패턴, 3-D Gate |
 | 2026-05-22 | §1·§5·§6·README 진행사항 동기화 — 50 passed, Phase 3 ✅ |
+| 2026-05-22 | Phase 5·6 — 79 passed, review_report·refactoring_before_after, 6-A/C/B 일부 완료 |

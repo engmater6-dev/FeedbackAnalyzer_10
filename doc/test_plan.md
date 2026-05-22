@@ -17,7 +17,7 @@
 ## 1. 목적·범위
 
 본 계획서는 **선정 샘플 예제**를 중심으로 Phase 1(Red) ~ Phase 2(Green) 테스트 범위·우선순위·커버리지·측정 전략을 정의한다.  
-**v1.1:** Green Gate 달성 상태·명령·Mom Test §8 연동을 반영한다 (Phase 3-A).
+**v1.1:** Green Gate 달성 (Phase 3-A). **v1.2:** Phase 5 Gate **79 passed** · Trend·keyword_db In-Scope.
 
 | 구분 | 포함 | 제외 (별도 계획) |
 |------|------|------------------|

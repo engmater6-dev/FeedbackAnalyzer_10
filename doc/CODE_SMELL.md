@@ -43,7 +43,7 @@
 | S-T01, S-T03 | — | 네이밍·contains_any (3-C-5~6) | ✅ |
 | — | — | `analysis_strategies` (3-C-7) | ✅ |
 
-**Phase 3-C:** ✅ 완료 · **Phase 4:** ✅ R-07/R-08 · **Phase 5:** Trend·DB ✅ · Phase 6·DEF-020~022 잔여
+**Phase 3-C:** ✅ 완료 · **Phase 4:** ✅ R-07/R-08 · **Phase 5:** Trend·DB ✅ · **Phase 6:** 전후 비교·[review_report.md](../review_report.md) ✅ · DEF-020~022·E2E 잔여
 
 ---
 
@@ -163,7 +163,7 @@
 2. ~~`matches_category()` main 통일~~ — **✅ Green** ([ADR-001](ADR-001-category-main-only.md))  
 3. ~~`fil_data` 제거~~ — **✅ Green**  
 4. ~~`render_page` → HtmlRenderer~~ — **✅ 3-C-2**  
-5. pytest + Mom Test §8 — **✅ Green** (39 passed, Golden Master)  
+5. pytest + Mom Test §8 — **✅** Green 39 → Phase 5 **79 passed**, Golden Master  
 6. ~~`global_sent/kw`~~ — **✅ 3-C-1** · ~~`file_handler`~~ — **✅ 3-C-3** · ~~네이밍·contains_any·전략~~ — **✅ 3-C-5~7**  
 
 ---

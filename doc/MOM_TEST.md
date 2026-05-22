@@ -2,12 +2,13 @@
 
 | 항목 | 내용 |
 |------|------|
-| 문서 버전 | 1.1 (Phase 3-A 초안) |
+| 문서 버전 | 1.2 (Phase 5~6) |
 | 일자 | 2026-05-22 |
 | 방법 | Rob Fitzpatrick *The Mom Test* 원칙 + 실제 코드·pytest 검증 |
-| 대상 | 제품 가설(README/PRD) vs 구현 (`green` / `refactor`) |
-| 브랜치 | `green` (Green 완료) · Phase 3 문서 작업: `refactor` |
-| 자동 검증 | **39 passed** · cov **97.42%** · Golden Master pass ([test_plan.md](test_plan.md), [report/02.green.md](../report/02.green.md)) |
+| 대상 | 제품 가설(README/PRD) vs 구현 (`new_feature`) |
+| 브랜치 | **`new_feature`** (Green·Refactor·Phase 4~5 완료) |
+| 자동 검증 | **79 passed** · cov **94.15%** · Golden Master pass ([test_plan.md](test_plan.md) v1.2) |
+| Phase 6 산출 | [review_report.md](../review_report.md) · [refactoring_before_after.md](../report/refactoring_before_after.md) |
 
 ---
 
@@ -183,14 +184,14 @@
 |------|------|------------|
 | **교육 제품** | ✅ Pass | Green·테스트·Golden Master 완료, Phase 3 Refactor 잔여 |
 | **VOC 분석 도구 (실무)** | ⚠️ **Partial Go** | Domain·IT·PRD Anchor **Pass** — **1차 VOC 스크리닝** 수준. Trend·DB·인터뷰·구조 개선 전 **완전 대체 불가** |
-| **문서 정직성** | ⚠️ Partial | README “건수 통계·규칙 기반” 완화(2026-05-22). 차트·자유 검색 표현은 Phase 5/6에서 정리 |
+| **문서 정직성** | ⚠️ Partial | README·리뷰 보고서 반영(2026-05-22). Trend·DB 구현 완료 · 인터뷰·발표는 Phase 6 잔여 |
 
 **Partial Go 근거 (자동 검증)**
 
 1. **Domain Gate** — Mom Test §8 항목 1~3 + CSV: pytest Domain·Anchor **6 passed**.  
 2. **Boundary Gate** — `/analyze`, `/filter`, `/upload`, `/download` IT Pass (B-03~B-06).  
-3. **회귀** — 전체 **39 passed**, cov **97.42%**, Golden Master `--check` OK.  
-4. **잔여 리스크** — 규칙 기반 substring 한계, main-only 카테고리(DEF-016), God Function·전역 상태(Phase 3), 실사용자 인터뷰 미수행.
+3. **회귀** — Green **39 passed** → Phase 5 **79 passed**, cov **94.15%**, Golden Master `--check` OK.  
+4. **잔여 리스크** — 규칙 기반 substring 한계, main-only(DEF-016), 실사용자 인터뷰·수동 E2E 미수행(Phase 6).
 
 **Go / No-Go (Green 후)**
 
@@ -245,3 +246,4 @@ python scripts/generate_golden_master.py --check
 |------|------|------|
 | 1.0 | 2026-05-22 | 초안 — Red 기준선, VOC Fail |
 | 1.1 | 2026-05-22 | Phase 3-A — §3.4 Green 재검증, §7 Partial Go, §8 자동 4항목 `[x]` |
+| 1.2 | 2026-05-22 | Phase 5 Gate 79 passed · Phase 6 리뷰 보고서 연동 |
