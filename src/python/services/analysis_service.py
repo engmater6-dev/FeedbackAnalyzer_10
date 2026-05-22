@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from typing import Dict, List
 
-from analysis_strategies import classify_sentiment, matches_category
+from services.category import matches_category
+from services.sentiment import classify_sentiment
 from constants import CATEGORY_KEYWORDS
 from models.feedback import Feedback
 
