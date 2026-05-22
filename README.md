@@ -9,9 +9,10 @@
 > - 학습 로드맵: [project_purpose.md](project_purpose.md)  
 > - Mom Test: [doc/MOM_TEST.md](doc/MOM_TEST.md)  
 > - 코드 스멜 분석: [doc/CODE_SMELL.md](doc/CODE_SMELL.md)  
-> - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)
+> - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)  
+> - QA 결함 목록: [doc/defect_list.md](doc/defect_list.md)
 
-> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). “감정 분석·시각화·검색”은 [Mom Test](doc/MOM_TEST.md) 기준으로 실제 능력보다 넓게 표현되어 있을 수 있습니다.
+> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). 화면에는 **건수 통계 요약** 위주이며, 고급 시각화·검색은 [Mom Test](doc/MOM_TEST.md) 기준 제한적입니다.
 
 ## 주요 기능
 
@@ -19,8 +20,8 @@
 - 키워드 기반 피드백 분류 (규칙 기반)
 - 감정 분류 (긍정/부정/중립, 키워드 매칭)
 - 피드백 필터링 (감정·카테고리 드롭다운)
-- 분석 결과 요약 (건수 통계)
-- 결과 CSV 다운로드 (필터 성공 후)
+- 분석 결과 요약 (감정·카테고리 **건수 통계**)
+- 결과 CSV 다운로드 (마지막 입력·필터 결과, `Session.download_feedbacks`)
 
 ## 요구사항
 
@@ -108,8 +109,9 @@ FeedbackAnalyzer_10/
 │   ├── PRD.md                 # 제품 요구사항 정의서
 │   ├── MOM_TEST.md            # Mom Test 검증 보고서
 │   ├── CODE_SMELL.md          # src 코드 스멜 분석
-│   └── test_plan.md           # 테스트 계획서
-├── report/                    # Red/Green 단계 산출물 (green_step0~5, 01.red 등)
+│   ├── test_plan.md           # 테스트 계획서
+│   └── defect_list.md         # QA 결함 목록 (22건, 완료/잔여)
+├── report/                    # Red/Green 산출물 (green_step0~6, 01.red 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
 │   ├── app.py                 # Flask, render_page (God Function)
@@ -123,11 +125,17 @@ FeedbackAnalyzer_10/
 │   ├── pytest.ini
 │   ├── requirements.txt
 │   ├── requirements-dev.txt   # pytest, pytest-cov, pydantic
+│   ├── scripts/
+│   │   └── generate_golden_master.py
 │   └── tests/
 │       ├── conftest.py
-│       ├── domain/              # Anchor 6 tests — Green Gate 통과
+│       ├── golden_master_expected.txt  # Approval baseline (git 관리)
+│       ├── golden_master.py / golden_master_capture.py
+│       ├── GOLDEN_MASTER.md
+│       ├── domain/
 │       │   ├── test_anchor_prd_example.py
-│       │   └── test_filters_regression.py
+│       │   ├── test_filters_regression.py
+│       │   └── test_golden_master.py
 │       └── boundary/            # IT-01~04 (Flask test_client)
 ├── project_purpose.md         # 8단계 미션
 └── README.md
@@ -157,8 +165,8 @@ FeedbackAnalyzer_10/
 | Phase | 상태 | 비고 |
 |-------|------|------|
 | Phase 0 | **대부분 완료** | 문서·스멜 분석 완료 · `python app.py` 수동 확인 `[ ]` |
-| Phase 1 | **완료** | Domain 6 + IT 8 · **38 passed** · cov **97%** (`--cov-fail-under=90`) |
-| Phase 2 | **B-01~B-06 완료** | Step 0~5 커밋 완료 · [report/](report/) 참고 |
+| Phase 1 | **완료** | Domain 6 + IT 8 + Golden 1 · **39 passed** · cov **97.4%** |
+| Phase 2 | **B-01~B-06 완료** | Green Step 0~6 · [report/](report/) · [defect_list.md](doc/defect_list.md) |
 | Phase 3~6 | **미착수** | Refactor·구조·Trend·DB·리뷰 |
 
 **테스트 실행** (`src/python`):
@@ -169,9 +177,13 @@ pytest tests/domain/test_anchor_prd_example.py tests/domain/test_filters_regress
 
 # Phase 1 DoD (전체 + 커버리지 90%)
 pytest tests/ --cov --cov-fail-under=90 -q
+
+# Golden Master 회귀 (Approval)
+pytest tests/domain/test_golden_master.py -v
+python scripts/generate_golden_master.py --check
 ```
 
-**Green 단계 커밋 이력 (`green` 브랜치):** Step 0~5 커밋 + Step 6 (테스트·UX)
+**Green 단계 커밋 (`green`):** `Red 기준선 재확인` → `감정 규칙 단일화` → `카테고리 main 규칙 통일` → `Gate 확인` → `부수 정리` → `B-03~B-06 적용` → `Step 6 테스트·UX 보완`
 
 ---
 
@@ -188,8 +200,23 @@ pytest tests/ --cov --cov-fail-under=90 -q
 | 4 | `filters` print 제거, 멀티라인 textarea·줄 단위 입력 | S-F04, UX | [x] |
 | 5 | `fil_data`→Session, CSV `text`, 업로드 분석, 로그 UI | B-03~B-06 | [x] |
 | 6 | cov **90%+**, boundary IT (`/analyze` 등) | Phase 1 | [x] |
+| 7 | Golden Master (`golden_master_expected.txt`) | 회귀 | [x] |
 
 **Green 합격 조건 (Domain 최소)** — [x] PRD 예시 부정·배송 필터 · [x] 중립 3건 일치 · [x] `"품질"` main only 일치
+
+**QA 잔여** — [doc/defect_list.md](doc/defect_list.md): 미완료 6건 (Phase 3 Refactor·doc 동기화)
+
+---
+
+### Golden Master (Approval 회귀)
+
+| 항목 | 내용 |
+|------|------|
+| 기준 파일 | `tests/golden_master_expected.txt` (**git 버전 관리 필수**) |
+| 비교 | 기준 없음 → 생성 후 FAIL · 있음 → 문자열 diff |
+| 갱신 | `python scripts/generate_golden_master.py --force` |
+
+상세: [tests/GOLDEN_MASTER.md](src/python/tests/GOLDEN_MASTER.md)
 
 ---
 
@@ -214,7 +241,8 @@ pytest tests/ --cov --cov-fail-under=90 -q
   - [x] PRD 예시 · 중립 3건 · 카테고리 `main` only (Mom Test §8)
 - [x] 단위 테스트 확장 — `test_session`, `test_logger`, `test_feedback`, `test_csv_parse` 등
 - [x] 통합 테스트 — `tests/boundary/test_routes_analyze_filter.py` (IT-01~04)
-- [x] `pytest tests/ --cov --cov-fail-under=90` → **97%+** ([report/green_step6_tests.md](report/green_step6_tests.md))
+- [x] `pytest tests/ --cov --cov-fail-under=90` → **97.4%** ([report/green_step6_tests.md](report/green_step6_tests.md))
+- [x] Golden Master — `test_golden_master.py` + `golden_master_expected.txt`
 
 ### Phase 2 — 버그 수정·UX (약 1.5시간)
 
@@ -241,7 +269,7 @@ pytest tests/ --cov --cov-fail-under=90 -q
 - [ ] `render_page()` 분리 → 템플릿/`HtmlRenderer` (S-A01, S-A02)
 - [ ] `file_handler.py` 삭제 또는 `download` 연동 (S-FH01)
 - [ ] 리팩토링 1건 추가 (전략 패턴·Extract Class 등)
-- [ ] README 주요 기능 문구와 실제 동작 일치 (Mom Test §6.1)
+- [x] README 주요 기능 문구 완화 (건수 통계·규칙 기반 명시) / [ ] 차트 등 시각화 추가는 선택
 
 ### Phase 4 — 구조·모델 (선택)
 
@@ -276,4 +304,4 @@ pytest tests/ --cov --cov-fail-under=90 -q
 | 로그 UI 없음 | S-L02 | ✅ B-06 | logger, app |
 | God Function / 죽은 코드 | S-A01, S-FH01 | ⏳ Phase 3 | app, file_handler |
 
-상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4
+상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4 · QA: [doc/defect_list.md](doc/defect_list.md)
