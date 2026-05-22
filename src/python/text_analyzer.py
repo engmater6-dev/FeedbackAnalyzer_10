@@ -4,6 +4,23 @@ from feedback import Feedback
 from constants import SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS
 
 
+def classify_sentiment(text: str) -> str:
+    """Single source of truth for sentiment (B-01)."""
+    if TextAnalyzer._contains_any(text, SENTIMENT_KEYWORDS["긍정"]):
+        return "긍정"
+    if TextAnalyzer._contains_any(text, SENTIMENT_KEYWORDS["부정"]):
+        return "부정"
+    return "중립"
+
+
+def matches_category(text: str, category: str) -> bool:
+    """Single source of truth for category (B-02): main keywords only."""
+    sub_map = CATEGORY_KEYWORDS.get(category)
+    if not sub_map or "main" not in sub_map:
+        return False
+    return TextAnalyzer._contains_any(text, sub_map["main"])
+
+
 class TextAnalyzer:
     global_sent: Dict[str, int] = {}
     global_kw: Dict[str, int] = {}
@@ -16,14 +33,7 @@ class TextAnalyzer:
         res = {"긍정": 0, "중립": 0, "부정": 0}
 
         for f in feedbacks:
-            txt = f.text
-            if self._contains_any(txt, SENTIMENT_KEYWORDS["긍정"]):
-                s = "긍정"
-            elif self._contains_any(txt, SENTIMENT_KEYWORDS["부정"]):
-                s = "부정"
-            else:
-                s = "중립"
-            res[s] += 1
+            res[classify_sentiment(f.text)] += 1
 
         TextAnalyzer.global_sent = res
         return res
@@ -32,11 +42,9 @@ class TextAnalyzer:
         res = {cat: 0 for cat in CATEGORY_KEYWORDS}
 
         for f in feedbacks:
-            txt = f.text
-            for cat, sub_map in CATEGORY_KEYWORDS.items():
-                if "main" in sub_map:
-                    if self._contains_any(txt, sub_map["main"]):
-                        res[cat] += 1
+            for cat in CATEGORY_KEYWORDS:
+                if matches_category(f.text, cat):
+                    res[cat] += 1
 
         TextAnalyzer.global_kw = res
         return res

@@ -1,0 +1,25 @@
+=== GOLDEN_MASTER v1 ===
+encoding: utf-8
+scope: domain_sent_kw_filter
+
+[anchor_prd]
+input=배송이 너무 늦어요. 화가 납니다.
+classify_sentiment=부정
+sent=긍정=0,부정=1,중립=0
+kw=가격=0,배송=1,사용성=0,서비스=0,품질=0
+filter_negative_shipping_count=1
+filter_negative_shipping_texts=배송이 너무 늦어요. 화가 납니다.
+filter_negative_all_count=1
+
+[neutral_three]
+line1=보통이에요|sentiment=중립
+line2=괜찮아요|sentiment=중립
+line3=특별한 불만 없음|sentiment=부정
+sent=긍정=0,부정=1,중립=2
+filter_neutral_count=2
+
+[category_main_only]
+input=품질
+kw=가격=0,배송=0,사용성=0,서비스=0,품질=1
+filter_quality_count=1
+
