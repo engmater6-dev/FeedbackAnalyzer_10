@@ -4,7 +4,7 @@ import io
 
 import pytest
 
-from session import Session
+from models.session import get_session
 
 ANCHOR_TEXT = "배송이 너무 늦어요. 화가 납니다."
 
@@ -26,8 +26,8 @@ class TestRoutesAnalyzeFilter:
         assert response.status_code == 200
         assert "감정 분포" in html
         assert "키워드 분포" in html
-        assert len(Session.get_current_feedbacks()) == 1
-        assert len(Session.get_download_feedbacks()) == 1
+        assert len(get_session().get_current_feedbacks()) == 1
+        assert len(get_session().get_download_feedbacks()) == 1
 
     def test_post_filter_negative_shipping(self, client):
         client.post("/analyze", data={"text": ANCHOR_TEXT})
@@ -39,7 +39,7 @@ class TestRoutesAnalyzeFilter:
 
         assert response.status_code == 200
         assert "분석 결과" in html
-        assert len(Session.get_download_feedbacks()) >= 1
+        assert len(get_session().get_download_feedbacks()) >= 1
 
     def test_post_analyze_multiline(self, client):
         response = client.post(
@@ -47,7 +47,7 @@ class TestRoutesAnalyzeFilter:
             data={"text": "좋습니다\n배송이 너무 늦어요. 화가 납니다."},
         )
         assert response.status_code == 200
-        assert len(Session.get_current_feedbacks()) == 2
+        assert len(get_session().get_current_feedbacks()) == 2
 
 
 @pytest.mark.boundary
@@ -65,7 +65,7 @@ class TestRoutesUploadDownload:
 
         assert response.status_code == 200
         assert "업로드 완료" in html or "피드백" in html
-        assert len(Session.get_current_feedbacks()) >= 1
+        assert len(get_session().get_current_feedbacks()) >= 1
         assert "감정 분포" in html
 
     def test_get_download_after_filter(self, client):
@@ -128,7 +128,7 @@ class TestRoutesUploadDownload:
     def test_post_analyze_empty_text(self, client):
         response = client.post("/analyze", data={"text": "   \n  "})
         assert response.status_code == 200
-        assert len(Session.get_current_feedbacks()) == 0
+        assert len(get_session().get_current_feedbacks()) == 0
 
 
 @pytest.mark.boundary
@@ -137,9 +137,11 @@ class TestRoutesErrors:
         def _raise():
             raise RuntimeError("test failure")
 
-        monkeypatch.setattr(
-            "handlers.analyze.Session.get_current_feedbacks", _raise
-        )
+        class _BrokenSession:
+            def get_current_feedbacks(self):
+                raise RuntimeError("test failure")
+
+        monkeypatch.setattr("handlers.analyze.get_session", lambda: _BrokenSession())
         response = client.post("/analyze", data={"text": "x"})
         html = response.get_data(as_text=True)
 
@@ -160,7 +162,7 @@ class TestRoutesErrors:
         assert "업로드 중 오류" in html
 
     def test_filter_exception_renders_error(self, client, monkeypatch):
-        Session.update_current_feedbacks([__import__("feedback").Feedback("x")])
+        get_session().update_current_feedbacks([__import__("feedback").Feedback("x")])
 
         def _fail(*_args, **_kwargs):
             raise RuntimeError("filter failed")

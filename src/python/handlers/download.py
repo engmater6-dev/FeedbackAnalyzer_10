@@ -6,7 +6,7 @@ from flask import Blueprint, Response
 from handlers._common import begin_page_request
 from html_renderer import render_page
 from logger import Logger
-from models.session import Session
+from models.session import get_session
 
 bp = Blueprint("download", __name__)
 
@@ -14,7 +14,7 @@ bp = Blueprint("download", __name__)
 @bp.route("/download", methods=["GET"])
 def download():
     begin_page_request()
-    rows = Session.get_download_feedbacks()
+    rows = get_session().get_download_feedbacks()
     if not rows:
         Logger.log_warning("다운로드할 피드백이 없습니다.")
         return render_page(warning="다운로드할 피드백이 없습니다.")

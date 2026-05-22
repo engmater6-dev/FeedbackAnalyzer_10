@@ -7,7 +7,6 @@ source =
     models,
     constants,
     feedback,
-    session,
     filters,
     text_analyzer,
     logger,

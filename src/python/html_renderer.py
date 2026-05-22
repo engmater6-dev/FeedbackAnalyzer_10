@@ -6,7 +6,7 @@ from typing import Dict, List, Optional
 
 from constants import CATEGORIES
 from logger import Logger
-from session import Session
+from models.session import get_session
 
 
 def _current_timestamp() -> str:
@@ -173,7 +173,7 @@ class HtmlRenderer:
             html += self._stats_block("감정 분포", sentiment_results)
         if keyword_results:
             html += self._stats_block("키워드 분포", keyword_results)
-        if Session.get_download_feedbacks():
+        if get_session().get_download_feedbacks():
             html += (
                 '<a href="/download">'
                 '<button class="btn-success">결과 다운로드</button></a>'

@@ -6,7 +6,7 @@ from handlers._deps import text_analyzer
 from html_renderer import render_page
 from logger import Logger
 from models.feedback import Feedback
-from models.session import Session
+from models.session import get_session
 
 bp = Blueprint("analyze", __name__)
 
@@ -15,7 +15,8 @@ bp = Blueprint("analyze", __name__)
 def analyze():
     begin_page_request()
     try:
-        feedbacks = Session.get_current_feedbacks()
+        session = get_session()
+        feedbacks = session.get_current_feedbacks()
         text = request.form.get("text", "")
 
         for line in text.splitlines():
@@ -23,8 +24,8 @@ def analyze():
             if line:
                 feedbacks.append(Feedback(line))
 
-        Session.update_current_feedbacks(feedbacks)
-        Session.set_download_feedbacks(feedbacks)
+        session.update_current_feedbacks(feedbacks)
+        session.set_download_feedbacks(feedbacks)
 
         for fb in feedbacks:
             Logger.log_info(fb.text)

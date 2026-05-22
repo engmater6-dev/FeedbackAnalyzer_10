@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import pytest
 from feedback import Feedback
-from session import Session
 from logger import Logger
+from models.session import reset_app_session
 
 
 @pytest.fixture
@@ -21,15 +21,13 @@ def client():
 
 @pytest.fixture(autouse=True)
 def reset_session():
-    Session.current_feedbacks = []
-    Session.download_feedbacks = []
+    reset_app_session()
     Logger._ui_logs = []
     Logger.show_warning_on_page = True
     Logger.show_error_on_page = True
     Logger.show_info_on_page = False
     yield
-    Session.current_feedbacks = []
-    Session.download_feedbacks = []
+    reset_app_session()
     Logger._ui_logs = []
     Logger.show_warning_on_page = True
     Logger.show_error_on_page = True

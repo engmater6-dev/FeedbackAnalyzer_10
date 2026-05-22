@@ -1,29 +1,45 @@
 # -*- coding: utf-8 -*-
-from typing import List
+from typing import List, Optional
 
 from models.feedback import Feedback
 
+_app_session: Optional["Session"] = None
+
+
+def get_session() -> "Session":
+    """Return the application-scoped session singleton."""
+    global _app_session
+    if _app_session is None:
+        _app_session = Session()
+    return _app_session
+
+
+def reset_app_session() -> "Session":
+    """Replace the singleton with a fresh session (tests, request reset)."""
+    global _app_session
+    _app_session = Session()
+    return _app_session
+
 
 class Session:
-    current_feedbacks: List[Feedback] = []
-    download_feedbacks: List[Feedback] = []
+    """Per-application feedback state (instance-based, S-S01)."""
 
-    @classmethod
-    def init_session(cls):
-        pass
+    def __init__(self) -> None:
+        self._current_feedbacks: List[Feedback] = []
+        self._download_feedbacks: List[Feedback] = []
 
-    @classmethod
-    def get_current_feedbacks(cls) -> List[Feedback]:
-        return cls.current_feedbacks
+    def init_session(self) -> None:
+        self._current_feedbacks = []
+        self._download_feedbacks = []
 
-    @classmethod
-    def update_current_feedbacks(cls, feedbacks: List[Feedback]):
-        cls.current_feedbacks = feedbacks
+    def get_current_feedbacks(self) -> List[Feedback]:
+        return self._current_feedbacks
 
-    @classmethod
-    def set_download_feedbacks(cls, feedbacks: List[Feedback]):
-        cls.download_feedbacks = list(feedbacks)
+    def update_current_feedbacks(self, feedbacks: List[Feedback]) -> None:
+        self._current_feedbacks = feedbacks
 
-    @classmethod
-    def get_download_feedbacks(cls) -> List[Feedback]:
-        return cls.download_feedbacks
+    def set_download_feedbacks(self, feedbacks: List[Feedback]) -> None:
+        self._download_feedbacks = list(feedbacks)
+
+    def get_download_feedbacks(self) -> List[Feedback]:
+        return self._download_feedbacks

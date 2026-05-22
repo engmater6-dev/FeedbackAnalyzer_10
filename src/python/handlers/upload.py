@@ -5,7 +5,7 @@ from handlers._common import begin_page_request
 from handlers._deps import text_analyzer
 from html_renderer import render_page
 from logger import Logger
-from models.session import Session
+from models.session import get_session
 from services.csv_parser import parse_csv_to_feedbacks
 
 bp = Blueprint("upload", __name__)
@@ -15,7 +15,8 @@ bp = Blueprint("upload", __name__)
 def upload():
     begin_page_request()
     try:
-        feedbacks = Session.get_current_feedbacks()
+        session = get_session()
+        feedbacks = session.get_current_feedbacks()
         file = request.files.get("file")
         added = 0
         if file and file.filename:
@@ -23,8 +24,8 @@ def upload():
             parsed = parse_csv_to_feedbacks(content)
             added = len(parsed)
             feedbacks.extend(parsed)
-            Session.update_current_feedbacks(feedbacks)
-            Session.set_download_feedbacks(feedbacks)
+            session.update_current_feedbacks(feedbacks)
+            session.set_download_feedbacks(feedbacks)
             Logger.log_info("파일이 성공적으로 업로드되었습니다.")
             if added == 0:
                 Logger.log_warning("CSV에서 읽을 수 있는 피드백이 없습니다.")
