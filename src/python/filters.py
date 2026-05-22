@@ -1,12 +1,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 from feedback import Feedback
-from constants import CATEGORY_KEYWORDS
-from text_analyzer import classify_sentiment, TextAnalyzer
-
-
-def _contains_any(text: str, keywords: List[str]) -> bool:
-    return TextAnalyzer._contains_any(text, keywords)
+from text_analyzer import classify_sentiment, matches_category
 
 
 def filter_feedbacks(
@@ -23,19 +18,13 @@ def filter_feedbacks(
     else:
         tmp_filtered = list(data_list)
 
-    # Keyword (category) filtering
+    # Keyword (category) filtering (B-02: same main-only rule as TextAnalyzer.kw)
     if keyword_filter != "전체":
-        final_filtered = []
-        if keyword_filter in CATEGORY_KEYWORDS:
-            cat_map = CATEGORY_KEYWORDS[keyword_filter]
-            for item in tmp_filtered:
-                txt = item.text
-                for sub_key, sub_keywords in cat_map.items():
-                    if sub_key == "main":
-                        continue
-                    if _contains_any(txt, sub_keywords):
-                        final_filtered.append(item)
-                        break
+        final_filtered = [
+            item
+            for item in tmp_filtered
+            if matches_category(item.text, keyword_filter)
+        ]
     else:
         final_filtered = tmp_filtered
 

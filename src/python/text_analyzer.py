@@ -13,6 +13,14 @@ def classify_sentiment(text: str) -> str:
     return "중립"
 
 
+def matches_category(text: str, category: str) -> bool:
+    """Single source of truth for category (B-02): main keywords only."""
+    sub_map = CATEGORY_KEYWORDS.get(category)
+    if not sub_map or "main" not in sub_map:
+        return False
+    return TextAnalyzer._contains_any(text, sub_map["main"])
+
+
 class TextAnalyzer:
     global_sent: Dict[str, int] = {}
     global_kw: Dict[str, int] = {}
@@ -34,11 +42,9 @@ class TextAnalyzer:
         res = {cat: 0 for cat in CATEGORY_KEYWORDS}
 
         for f in feedbacks:
-            txt = f.text
-            for cat, sub_map in CATEGORY_KEYWORDS.items():
-                if "main" in sub_map:
-                    if self._contains_any(txt, sub_map["main"]):
-                        res[cat] += 1
+            for cat in CATEGORY_KEYWORDS:
+                if matches_category(f.text, cat):
+                    res[cat] += 1
 
         TextAnalyzer.global_kw = res
         return res
