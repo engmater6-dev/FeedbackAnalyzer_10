@@ -98,8 +98,30 @@ text
 
 ---
 
+## 8. Trend 샘플 CSV (Phase 5, R-09)
+
+학습·데모용: [sample/test_feedback_trend.csv](../sample/test_feedback_trend.csv)
+
+| 컬럼 | 필수 | 형식 |
+|------|------|------|
+| `date` | Trend 샘플에서 권장 | `YYYY-MM-DD` — #11 추이 집계용 |
+| `text` | ✅ | [§1](#1-권장-형식-표준)과 동일 |
+
+```csv
+date,text
+2026-01-10,배송이 너무 늦어요. 화가 납니다.
+```
+
+| 단계 | 파서 동작 |
+|------|-----------|
+| Phase 5-1 (현재) | B-04 `parse_csv_to_feedbacks` — **`text` 열만** 적재, `date` 무시 |
+| Phase 5-2+ (#11) | `date` 기반 기간별 sent/kw 집계·시각화 |
+
+---
+
 ## 7. 변경 이력
 
 | 버전 | 일자 | 변경 |
 |------|------|------|
+| 1.1 | 2026-05-22 | §8 Trend 샘플 `date,text` (R-09) |
 | 1.0 | 2026-05-22 | Phase 3-B — B-04 구현 기준 명세 (DEF-015) |
