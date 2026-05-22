@@ -117,14 +117,17 @@ FeedbackAnalyzer_10/
 ├── report/                    # Red/Green 산출물 (green_step0~6, 01.red 등)
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
-│   ├── app.py                 # Flask 라우팅·CSV·비즈니스 흐름
+│   ├── app.py                 # Flask 부트스트랩·Blueprint 등록
+│   ├── handlers/              # HTTP Blueprint (analyze, upload, filter, …)
+│   ├── services/              # csv_parser, sentiment, category, analysis, filter
+│   ├── models/                # Feedback, Session (인스턴스 + get_session)
 │   ├── html_renderer.py       # HtmlRenderer — 대시보드 HTML (3-C-2)
-│   ├── feedback.py            # Feedback 모델
-│   ├── text_analyzer.py       # analyze_sentiments(), analyze_keywords()
+│   ├── feedback.py            # 셔임 → models.feedback
+│   ├── session.py             # 셔임 → models.session
+│   ├── text_analyzer.py       # 셔임 → services.analysis_service
+│   ├── filters.py             # 셔임 → services.filter_service
 │   ├── text_utils.py          # contains_any() (3-C-6)
-│   ├── analysis_strategies.py # RuleBased 감정·카테고리 전략 (3-C-7)
-│   ├── filters.py             # filter_feedbacks() — constants·analyzer 규칙 공유
-│   ├── session.py             # current_feedbacks, download_feedbacks (B-03)
+│   ├── analysis_strategies.py # 셔임 → services.sentiment/category
 │   ├── logger.py              # stdout + level별 페이지 토글 (B-06, 3-C-4)
 │   ├── constants.py           # SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS (SSOT)
 │   ├── pytest.ini
@@ -177,7 +180,7 @@ FeedbackAnalyzer_10/
 
 [project_purpose.md](project_purpose.md) 8단계 미션 + [CODE_SMELL.md](doc/CODE_SMELL.md) 스멜 ID를 매핑한 체크리스트입니다. **TDD: Red → Green → Refactor** 순서를 권장합니다.
 
-### 진행 현황 (2026-05-22 · 브랜치 **`refactor`**)
+### 진행 현황 (2026-05-22 · 브랜치 **`feature/phase-4-structure`**)
 
 | Phase | 상태 | 비고 |
 |-------|------|------|
@@ -185,12 +188,13 @@ FeedbackAnalyzer_10/
 | Phase 1 | **완료** (`green`) | pytest · cov 90%+ · Golden Master |
 | Phase 2 | **완료** (`green`) | B-01~B-06 · [report/02.green.md](report/02.green.md) |
 | Phase 3 | **완료** (`refactor`) | 3-A~B 문서 · **3-C-1~7** · **3-D Gate** |
-| Phase 4~6 | **미착수** | 구조 분리(선택) · Trend·DB · 팀 리뷰·발표 |
+| Phase 4 | **완료** | R-07·R-08 · handlers/services/models · **4-D Gate** |
+| Phase 5~6 | **미착수** | Trend·DB · 팀 리뷰·발표 |
 
-| 지표 (`refactor` 최신) | 수치 |
+| 지표 (Phase 4 Gate) | 수치 |
 |------------------------|------|
-| pytest | **50 passed** |
-| 커버리지 | **97.78%** |
+| pytest | **55 passed** |
+| 커버리지 | **97.57%** |
 | Golden Master | **pass** (`--check`) |
 | QA 결함 | 완료 **21** · 부분 **3** (DEF-020~022) · 미완료 **0** ([defect_list.md](doc/defect_list.md)) |
 
@@ -211,6 +215,8 @@ python scripts/generate_golden_master.py --check
 **Green 커밋 (`green`):** `Red 기준선` → `감정·카테고리 SSOT` → `B-03~B-06` → `Step 6` → `green 진행`
 
 **Refactor 커밋 (`refactor`):** `CSV 규칙·main-only 정책 문서` → `global_sent, global_kw 제거` → `render_page 분리` → `file_handler 제거` → `Logger UI 토글` → `contains_any 공통 유틸` → `분석 전략 패턴 적용` → `sent/kw 네이밍 개선`
+
+**Phase 4 커밋 (`feature/phase-4-structure`):** `handlers/services/models 분리` → `sentiment/category 서비스` → `Feedback setter` → `Session 인스턴스` → Gate
 
 ---
 
@@ -312,12 +318,16 @@ python scripts/generate_golden_master.py --check
 
 - [x] README 주요 기능 문구 완화 / [ ] 차트·Trend는 Phase 5 선택
 
-### Phase 4 — 구조·모델 (선택)
+### Phase 4 — 구조·모델 ✅
 
-- [ ] `handlers/`, `services/`, `models/` 분리 (PRD R-07)
-- [ ] `services/sentiment.py`, `services/category.py` 추출
-- [ ] `Feedback`에 sentiment, category, setter (S-FB01, S-FB02)
-- [ ] `Session` 인스턴스 기반 상태 (S-S01, S-S02)
+- [x] `handlers/`, `services/`, `models/` 분리 (PRD R-07)
+- [x] `services/sentiment.py`, `services/category.py` 추출
+- [x] `Feedback`에 sentiment, category, setter (S-FB01, S-FB02, R-08)
+- [x] `Session` 인스턴스 기반 + `get_session()` / `reset_app_session()` (S-S01)
+
+#### 4-D · Gate
+- [x] `pytest tests/ --cov --cov-fail-under=90` — **55 passed**, cov **97.57%**
+- [x] `python scripts/generate_golden_master.py --check` OK (diff 없음)
 
 ### Phase 5 — 확장 (약 3시간)
 

@@ -5,7 +5,7 @@
 | 문서 ID | QA-DEF-01 |
 | 작성 | QA 리드 |
 | 일자 | 2026-05-22 |
-| 대상 브랜치 | **`refactor`** (기준 `green` + Phase 3 Refactor) |
+| 대상 브랜치 | **`feature/phase-4-structure`** (Phase 3 `refactor` + Phase 4 구조) |
 | 근거 | Red · Green · Refactor · QA 분석(`doc/`, `README.md`, `src/`) |
 | 관련 | [PRD.md](PRD.md) §4, [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
 
@@ -31,10 +31,11 @@
 | TDD Red (`red`) | ✅ Anchor 4 fail 고정 |
 | TDD Green (`green`) | ✅ B-01~B-06, Step 0~7, Golden Master |
 | Phase 3 Refactor (`refactor`) | ✅ 3-A~3-D (3-C-1~7, Gate **50 passed**) |
-| Phase 4~5 (선택) | ⏳ 구조·Trend·DB |
+| Phase 4 구조 (`feature/phase-4-structure`) | ✅ 4-1~4-5 · Gate **55 passed** |
+| Phase 5 (선택) | ⏳ Trend·DB |
 | Phase 6 QA 종결 | ⏳ §6.6 Gate (DEF-020~022 문서·발표) |
 
-> **최종 갱신 (2026-05-22 · `refactor`):** pytest **50 passed** · cov **97.78%** · Golden Master **OK** · 구조·UX DEF **008~019 완료** · 문서 DEF **020~022 부분완료**
+> **최종 갱신 (2026-05-22 · `feature/phase-4-structure`):** pytest **55 passed** · cov **97.57%** · Golden Master **OK** · Phase 4 R-07/R-08 완료 · 문서 DEF **020~022 부분완료**
 
 ---
 
@@ -238,13 +239,13 @@ python scripts/generate_golden_master.py --check
 
 | 순서 | 체크 | 작업 | 연관 |
 |------|------|------|------|
-| 4-1 | [ ] | `handlers/`, `services/`, `models/` 분리 | R-07 |
-| 4-2 | [ ] | `services/sentiment.py`, `services/category.py` | 017 연계 |
-| 4-3 | [ ] | `Feedback` setter·분석 결과 필드 | S-FB01 |
-| 4-4 | [ ] | `Session` 인스턴스 기반 | S-S01 |
-| 4-5 | [ ] | 3-D 회귀 동일 실행 | 010,023 |
+| 4-1 | [x] | `handlers/`, `services/`, `models/` 분리 | R-07 |
+| 4-2 | [x] | `services/sentiment.py`, `services/category.py` | 017 연계 |
+| 4-3 | [x] | `Feedback` setter·분석 결과 필드 | S-FB01, R-08 |
+| 4-4 | [x] | `Session` 인스턴스 + `get_session()` | S-S01 |
+| 4-5 | [x] | 회귀 Gate (55 passed, GM `--check`) | 010,023 |
 
-**Phase 4 Gate:** 구조 분리 후 39+ tests pass (신규 테스트 추가 시 Golden Master 갱신 검토)
+**Phase 4 Gate:** ✅ **55 passed** · cov **97.57%** · Golden Master **OK** (diff 없음, `--force` 불필요)
 
 ---
 

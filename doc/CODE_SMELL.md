@@ -43,7 +43,7 @@
 | S-T01, S-T03 | — | 네이밍·contains_any (3-C-5~6) | ✅ |
 | — | — | `analysis_strategies` (3-C-7) | ✅ |
 
-**Phase 3-C:** ✅ 완료 · Phase 4~6·문서 DEF-020~022 잔여
+**Phase 3-C:** ✅ 완료 · **Phase 4:** ✅ R-07/R-08 · Phase 5~6·문서 DEF-020~022 잔여
 
 ---
 
@@ -57,7 +57,7 @@
 | S-A02 | God Module | High | ~~프레젠테이션 혼재~~ → **✅ 3-C-2** app=라우팅·I/O, html_renderer=UI |
 | S-A03 | 전역 `fil_data` | High | ~~B-03~~ → **✅ Green** Session.download |
 | S-A04 | 불필요한 `global fil_data` | Low | ~~제거됨~~ **✅ Green** |
-| S-A05 | Primitive Obsession | Med | `list`, `dict`만 전달, 도메인 모델 빈약 |
+| S-A05 | Primitive Obsession | Med | ~~도메인 빈약~~ → **⚠️ Phase 4** Feedback에 sentiment/category (부분 개선) |
 | S-A06 | CSV 스펙 불일치 | Med | ~~B-04~~ → **✅ Green** [CSV_FORMAT](CSV_FORMAT.md) |
 | S-A07 | 업로드 후 분석 누락 | Low | ~~B-05~~ → **✅ Green** |
 
@@ -90,20 +90,20 @@
 | S-C02 | 불완전한 SSOT | High — filters가 감정은 별도 사전 사용 |
 | S-C03 | 과도한 중첩 dict | Low |
 
-### 2.5 `session.py`
+### 2.5 `models/session.py` (구 `session.py`)
 
 | ID | 스멜 | 심각도 |
 |----|------|--------|
-| S-S01 | 클래스 변수 전역 상태 | High |
-| S-S02 | 빈 `init_session()` | Med |
-| S-S03 | `update_current_feedbacks` 미사용 | Low |
+| S-S01 | 클래스 변수 전역 상태 | High | ~~클래스 변수~~ → **✅ Phase 4** 인스턴스 + `get_session()` |
+| S-S02 | 빈 `init_session()` | Med | **✅ Phase 4** 목록 초기화 |
+| S-S03 | `update_current_feedbacks` 미사용 | Low | **✅ Phase 4** handlers 사용 |
 
-### 2.6 `feedback.py`
+### 2.6 `models/feedback.py` (구 `feedback.py`)
 
 | ID | 스멜 | 심각도 |
 |----|------|--------|
-| S-FB01 | Anemic Domain Model | Med |
-| S-FB02 | setter·분석 결과 없음 | Low |
+| S-FB01 | Anemic Domain Model | Med | **⚠️ Phase 4** sentiment/category 필드 (부분 개선) |
+| S-FB02 | setter·분석 결과 없음 | Low | **✅ Phase 4** setter + `annotate_feedbacks` |
 
 ### 2.7 `logger.py`
 
