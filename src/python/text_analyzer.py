@@ -4,6 +4,15 @@ from feedback import Feedback
 from constants import SENTIMENT_KEYWORDS, CATEGORY_KEYWORDS
 
 
+def classify_sentiment(text: str) -> str:
+    """Single source of truth for sentiment (B-01)."""
+    if TextAnalyzer._contains_any(text, SENTIMENT_KEYWORDS["긍정"]):
+        return "긍정"
+    if TextAnalyzer._contains_any(text, SENTIMENT_KEYWORDS["부정"]):
+        return "부정"
+    return "중립"
+
+
 class TextAnalyzer:
     global_sent: Dict[str, int] = {}
     global_kw: Dict[str, int] = {}
@@ -16,14 +25,7 @@ class TextAnalyzer:
         res = {"긍정": 0, "중립": 0, "부정": 0}
 
         for f in feedbacks:
-            txt = f.text
-            if self._contains_any(txt, SENTIMENT_KEYWORDS["긍정"]):
-                s = "긍정"
-            elif self._contains_any(txt, SENTIMENT_KEYWORDS["부정"]):
-                s = "부정"
-            else:
-                s = "중립"
-            res[s] += 1
+            res[classify_sentiment(f.text)] += 1
 
         TextAnalyzer.global_sent = res
         return res
