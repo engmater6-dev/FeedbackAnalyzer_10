@@ -172,6 +172,6 @@
 
 ## 9. 참고
 
-- [doc/PRD.md](../doc/PRD.md) §4 버그 목록  
+- [PRD.md](PRD.md) §4 버그 목록  
 - [README.md](../README.md) To Do List Phase 0~2  
 - Rob Fitzpatrick, *The Mom Test* (2013)

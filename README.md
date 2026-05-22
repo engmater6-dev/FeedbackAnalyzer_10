@@ -7,10 +7,11 @@
 > **실습 프로젝트**: 의도적인 코드 스멜·안티패턴이 포함되어 있습니다.  
 > - 제품 요구사항: [doc/PRD.md](doc/PRD.md)  
 > - 학습 로드맵: [project_purpose.md](project_purpose.md)  
-> - Mom Test: [report/MOM_TEST.md](report/MOM_TEST.md)  
-> - 코드 스멜 분석: [report/CODE_SMELL.md](report/CODE_SMELL.md)
+> - Mom Test: [doc/MOM_TEST.md](doc/MOM_TEST.md)  
+> - 코드 스멜 분석: [doc/CODE_SMELL.md](doc/CODE_SMELL.md)  
+> - 테스트 계획: [doc/test_plan.md](doc/test_plan.md)
 
-> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). “감정 분석·시각화·검색”은 [Mom Test](report/MOM_TEST.md) 기준으로 실제 능력보다 넓게 표현되어 있을 수 있습니다.
+> **현재 분석 방식**: 규칙 기반 키워드 substring 매칭 (ML/NLP 아님). “감정 분석·시각화·검색”은 [Mom Test](doc/MOM_TEST.md) 기준으로 실제 능력보다 넓게 표현되어 있을 수 있습니다.
 
 ## 주요 기능
 
@@ -82,7 +83,7 @@ pip install -r requirements.txt
 테스트 도입 시 (Phase 1):
 
 ```bash
-pip install pytest pytest-cov
+pip install -r requirements-dev.txt
 ```
 
 ### 5. 서버 실행
@@ -104,10 +105,11 @@ deactivate
 ```
 FeedbackAnalyzer_10/
 ├── doc/
-│   └── PRD.md                 # 제품 요구사항 정의서
-├── report/
+│   ├── PRD.md                 # 제품 요구사항 정의서
 │   ├── MOM_TEST.md            # Mom Test 검증 보고서
-│   └── CODE_SMELL.md          # src 코드 스멜 분석
+│   ├── CODE_SMELL.md          # src 코드 스멜 분석
+│   └── test_plan.md           # 테스트 계획서
+├── report/                    # 세션·커버리지 등 산출물
 ├── sample/                    # 샘플 CSV (test_feedback_trend.csv 등)
 ├── src/python/
 │   ├── app.py                 # Flask, render_page (God Function)
@@ -118,7 +120,15 @@ FeedbackAnalyzer_10/
 │   ├── logger.py              # print 기반 로깅
 │   ├── constants.py           # 키워드·카테고리 상수
 │   ├── file_handler.py        # 미사용 (Lava Flow)
-│   └── requirements.txt
+│   ├── pytest.ini
+│   ├── requirements.txt
+│   ├── requirements-dev.txt   # pytest, pytest-cov, pydantic
+│   └── tests/                 # Phase 1 (TDD Red 완료)
+│       ├── conftest.py
+│       ├── domain/
+│       │   ├── test_anchor_prd_example.py
+│       │   └── test_filters_regression.py
+│       └── boundary/          # 스텁 (Green 이후)
 ├── project_purpose.md         # 8단계 미션
 └── README.md
 ```
@@ -139,33 +149,50 @@ FeedbackAnalyzer_10/
 
 ## To Do List
 
-[project_purpose.md](project_purpose.md) 8단계 미션 + [CODE_SMELL.md](report/CODE_SMELL.md) 스멜 ID를 매핑한 체크리스트입니다. **TDD: Red → Green → Refactor** 순서를 권장합니다.
+[project_purpose.md](project_purpose.md) 8단계 미션 + [CODE_SMELL.md](doc/CODE_SMELL.md) 스멜 ID를 매핑한 체크리스트입니다. **TDD: Red → Green → Refactor** 순서를 권장합니다.
+
+### 진행 현황 (2026-05-22 · 브랜치 `red`)
+
+| Phase | 상태 | 비고 |
+|-------|------|------|
+| Phase 0 | **대부분 완료** | 문서·버그 증거·스멜 분석 완료 |
+| Phase 1 | **Red 완료** / Green 대기 | Domain 6테스트 · **4 failed, 2 passed** |
+| Phase 2~6 | 미착수 | 다음: B-01/B-02 Green |
+
+**TDD Red Gate 확인** (`src/python`):
+
+```bash
+pytest tests/domain/test_anchor_prd_example.py tests/domain/test_filters_regression.py -v
+# 기대: 4 failed, 2 passed (의도적 실패)
+```
+
+---
 
 ### Phase 0 — 준비·스멜 인지 (약 1시간)
 
-- [ ] [doc/PRD.md](doc/PRD.md), [report/MOM_TEST.md](report/MOM_TEST.md), [report/CODE_SMELL.md](report/CODE_SMELL.md) 읽기
-- [ ] 가상환경·`pip install -r requirements.txt`
+- [x] [doc/PRD.md](doc/PRD.md), [doc/MOM_TEST.md](doc/MOM_TEST.md), [doc/CODE_SMELL.md](doc/CODE_SMELL.md), [doc/test_plan.md](doc/test_plan.md) 읽기
+- [x] 가상환경·`pip install -r requirements.txt` · `pip install -r requirements-dev.txt`
 - [ ] `python app.py` → `http://localhost:8080` 확인
-- [ ] **버그 재현** (Mom Test §3)
-  - [ ] `"배송이 너무 늦어요. 화가 납니다."` → 분석 중립 vs 기대 부정 (S-T04)
-  - [ ] `filter(부정, 배송)` → 0건 (S-F02, S-F03)
-  - [ ] 중립 샘플 3건 → `sent` 중립 수 ≠ `filter(중립)` 건수 (S-F01)
-- [ ] 스멜 체크: `app.render_page` God Function (S-A01), `filters.S_KEYWORDS` 중복 (S-F01)
+- [x] **버그 재현** (Mom Test §3) — 문서·테스트로 고정
+  - [x] `"배송이 너무 늦어요. 화가 납니다."` → 분석 중립 vs 기대 부정 (S-T04) · `test_anchor_prd_example.py`
+  - [x] `filter(부정, 배송)` → 0건 (S-F02, S-F03) · 동일 파일
+  - [x] 중립 샘플 3건 → `sent` 중립 수 ≠ `filter(중립)` 건수 (S-F01) · `test_filters_regression.py`
+- [x] 스멜 체크: `app.render_page` God Function (S-A01), `filters.S_KEYWORDS` 중복 (S-F01) — [CODE_SMELL.md](doc/CODE_SMELL.md)
 
 ### Phase 1 — 테스트 기반 구축 (약 2시간)
 
 **목표**: 커버리지 **90%+**, 스멜 S-T02·S-F01~F03을 테스트로 고정
 
-- [ ] `tests/` + `pytest`, `pytest-cov` 설치
-- [ ] **Red** — 실패해야 하는 케이스 먼저 작성
-  - [ ] PRD 예시 문장 → `sent` 부정, `filter(부정,배송)` ≥1 (Mom Test §8)
-  - [ ] 중립 3건 → 분석·필터 건수 일치
-  - [ ] `"배송"` only → `kw` vs `filter(배송)` 일치
-- [ ] 단위 테스트
-  - [ ] `Feedback`, `Session` (S-FB01, S-S01)
-  - [ ] `TextAnalyzer.sent()`, `kw()` (S-T01, S-T05)
-  - [ ] `filter_feedbacks()` (S-F02, S-F03, S-F06)
-- [ ] 통합 테스트: `/analyze`, `/filter`, `/upload`, `/download` (S-A03)
+- [x] `tests/` + `pytest`, `pytest-cov` 설치 (`requirements-dev.txt`, `pytest.ini`, `conftest.py`)
+- [x] **Red** — 실패해야 하는 케이스 먼저 작성 (**TDD Red 단계 완료**)
+  - [x] PRD 예시 문장 → `sent` 부정, `filter(부정,배송)` ≥1 (Mom Test §8) — 현재 **FAIL**
+  - [x] 중립 3건 → 분석·필터 건수 일치 — 현재 **FAIL**
+  - [x] 카테고리 `main` only (`"품질"`) → `kw` vs `filter(품질)` 일치 (B-02; `"배송"` only는 sub에 `배송` 포함으로 제외) — 현재 **FAIL**
+- [ ] 단위 테스트 (Green 이후 확장)
+  - [ ] `Feedback`, `Session` (S-FB01, S-S01) — 스텁 `skip`
+  - [x] `TextAnalyzer.sent()`, `kw()` — Anchor·회귀 Red에 포함
+  - [x] `filter_feedbacks()` — Anchor·회귀 Red에 포함
+- [ ] 통합 테스트: `/analyze`, `/filter`, `/upload`, `/download` (S-A03) — `tests/boundary/` 스텁
 - [ ] `pytest --cov` → **90% 이상**
 
 ### Phase 2 — 버그 수정·UX (약 1.5시간)
@@ -228,4 +255,4 @@ FeedbackAnalyzer_10/
 | 로그 UI 없음 | S-L02 | logger, app |
 | 죽은 코드 | S-FH01 | file_handler |
 
-상세: [report/CODE_SMELL.md](report/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4
+상세: [doc/CODE_SMELL.md](doc/CODE_SMELL.md) · PRD 버그: [doc/PRD.md](doc/PRD.md) §4

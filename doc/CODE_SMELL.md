@@ -3,7 +3,7 @@
 | 항목 | 내용 |
 |------|------|
 | 일자 | 2026-05-22 |
-| 기준 문서 | [doc/PRD.md](../doc/PRD.md), [report/MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
+| 기준 문서 | [PRD.md](PRD.md), [MOM_TEST.md](MOM_TEST.md), [README.md](../README.md) |
 | 분석 대상 | `src/python/*.py` (8모듈) |
 
 ---
@@ -146,4 +146,4 @@
 ## 7. 참고
 
 - [MOM_TEST.md](MOM_TEST.md)
-- [doc/PRD.md](../doc/PRD.md) §4, §5
+- [PRD.md](PRD.md) §4, §5

@@ -5,7 +5,7 @@
 | 문서 버전 | 1.0 |
 | 최종 수정 | 2026-05-22 |
 | 프로젝트명 | 리팩토링 챌린지: 고객 피드백 분석 시스템 |
-| 관련 문서 | [README.md](../README.md), [project_purpose.md](../project_purpose.md) |
+| 관련 문서 | [README.md](../README.md), [project_purpose.md](../project_purpose.md), [MOM_TEST.md](MOM_TEST.md), [CODE_SMELL.md](CODE_SMELL.md), [test_plan.md](test_plan.md) |
 
 ---
 
